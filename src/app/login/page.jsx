@@ -1,11 +1,9 @@
-import React from "react";
-// import { auth } from "@/lib/firebaseClient";
+import AuthForms from "@/components/auth/LoginForm";
 
-const page = () => {
-  //   auth.currentUser.getIdToken(true).then((token) => {
-  //     console.log("TOKEN:", token);
-  //   });
-  return <div></div>;
-};
-
-export default page;
+export default function login() {
+  return (
+    <main className="min-h-screen flex items-center justify-center">
+      <AuthForms />
+    </main>
+  );
+}
