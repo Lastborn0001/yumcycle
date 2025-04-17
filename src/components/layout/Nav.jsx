@@ -63,10 +63,20 @@ const Nav = () => {
           >
             Home
           </li>
-          <li className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500">
+          <li
+            onClick={() => {
+              router.push("/restaurants");
+            }}
+            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+          >
             Restaurants
           </li>
-          <li className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500">
+          <li
+            onClick={() => {
+              router.push("/foodWaste");
+            }}
+            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+          >
             Food Waste
           </li>
           <li className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500">
