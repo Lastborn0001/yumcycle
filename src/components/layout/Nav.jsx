@@ -31,6 +31,14 @@ const Nav = () => {
     return () => unsubscribe();
   }, [auth]);
 
+  const handleNavigation = (path) => {
+    if (!user && path !== "/") {
+      router.push("/login");
+      return;
+    }
+    router.push(path);
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -44,7 +52,12 @@ const Nav = () => {
     <nav className="border-b-2 border-gray-200 fixed w-full backdrop-blur-sm z-10">
       <div className="flex justify-between p-[15px] w-full navv m-auto">
         <div className="flex items-center justify-between">
-          <h1 className="text-orange-600 font-bold text-[20px]">Yumcycle</h1>
+          <h1
+            onClick={() => handleNavigation("/dashboard")}
+            className="text-orange-600 cursor-pointer font-bold text-[20px]"
+          >
+            Yumcycle
+          </h1>
         </div>
         <button
           className="lg:hidden mr-4"
@@ -56,30 +69,27 @@ const Nav = () => {
         {/* Desktop Navigation */}
         <ul className="hidden lg:flex justify-around pt-2">
           <li
-            onClick={() => {
-              router.push("/dashboard");
-            }}
+            onClick={() => handleNavigation("/dashboard")}
             className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             Home
           </li>
           <li
-            onClick={() => {
-              router.push("/restaurants");
-            }}
+            onClick={() => handleNavigation("/restaurants")}
             className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             Restaurants
           </li>
           <li
-            onClick={() => {
-              router.push("/foodWaste");
-            }}
+            onClick={() => handleNavigation("/foodWaste")}
             className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             Food Waste
           </li>
-          <li className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500">
+          <li
+            onClick={() => handleNavigation("/orders")}
+            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+          >
             My Orders
           </li>
         </ul>
@@ -182,7 +192,7 @@ const Nav = () => {
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ type: "tween" }}
-                className="fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-xl"
+                className="fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-xl "
               >
                 <div className="p-4 flex justify-end">
                   <button onClick={() => setIsMobileMenuOpen(false)}>
@@ -190,7 +200,7 @@ const Nav = () => {
                   </button>
                 </div>
 
-                <div className="p-4 space-y-6">
+                <div className="p-4 space-y-6 bg-white">
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <input
@@ -201,16 +211,28 @@ const Nav = () => {
                   </div>
 
                   <ul className="space-y-4">
-                    <li className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500">
+                    <li
+                      onClick={() => handleNavigation("/dashboard")}
+                      className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500"
+                    >
                       Home
                     </li>
-                    <li className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500">
+                    <li
+                      onClick={() => handleNavigation("/restaurants")}
+                      className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500"
+                    >
                       Restaurants
                     </li>
-                    <li className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500">
+                    <li
+                      onClick={() => handleNavigation("/foodWaste")}
+                      className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500"
+                    >
                       Food Waste
                     </li>
-                    <li className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500">
+                    <li
+                      onClick={() => handleNavigation("/orders")}
+                      className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500"
+                    >
                       My Orders
                     </li>
                   </ul>

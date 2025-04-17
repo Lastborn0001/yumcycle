@@ -1,7 +1,9 @@
 import { Clock, Map, Truck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const PopularRestaurant = () => {
+  const router = useRouter();
   return (
     <section className="xl:w-[80%] w-full m-auto ">
       <div className="flex justify-between p-10">
@@ -11,7 +13,12 @@ const PopularRestaurant = () => {
             Our top-rated restaurants with the best food and service
           </p>
         </div>
-        <p className="text-[13px] text-orange-500 cursor-pointer">
+        <p
+          onClick={() => {
+            router.push("/restaurants");
+          }}
+          className="text-[13px] text-orange-500 cursor-pointer"
+        >
           View All &gt;
         </p>
       </div>
