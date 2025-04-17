@@ -55,7 +55,12 @@ const Nav = () => {
 
         {/* Desktop Navigation */}
         <ul className="hidden lg:flex justify-around pt-2">
-          <li className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500">
+          <li
+            onClick={() => {
+              router.push("/dashboard");
+            }}
+            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+          >
             Home
           </li>
           <li className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500">
