@@ -6,7 +6,6 @@ import HowItWork from "@/components/ui/HowItWork";
 import Mission from "@/components/ui/Mission";
 import PopularRestaurant from "@/components/ui/PopularRestaurant";
 import ProtectedRoute from "@/components/ProtectedRoute";
-
 export default function Dashboard() {
   return (
     <>

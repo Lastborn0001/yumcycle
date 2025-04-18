@@ -4,7 +4,7 @@ const menuItemSchema = new mongoose.Schema(
   {
     restaurant: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Restaurant",
+      ref: "RestaurantProfile",
       required: [true, "Restaurant is required"],
     },
     name: {

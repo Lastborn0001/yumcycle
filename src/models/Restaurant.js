@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const restaurantSchema = new mongoose.Schema(
   {
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "Owner is required"],
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -26,13 +31,13 @@ const restaurantSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      required: [true, "Rating is required"],
+      default: 0,
       min: [0, "Rating must be at least 0"],
       max: [5, "Rating cannot exceed 5"],
     },
     minOrder: {
       type: Number,
-      required: [true, "Minimum order is required"],
+      default: 0,
       min: [0, "Minimum order must be at least 0"],
     },
     deliveryTime: {
@@ -52,16 +57,21 @@ const restaurantSchema = new mongoose.Schema(
     },
     isEcoFriendly: {
       type: Boolean,
-      required: [true, "Eco-friendly status is required"],
+      default: false,
     },
     location: {
       type: String,
       required: [true, "Location is required"],
       trim: true,
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 

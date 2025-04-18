@@ -1,10 +1,15 @@
-import admin from "firebase-admin";
+const admin = require("firebase-admin");
 
-const serviceAccount = process.env.FIREBASE_ADMIN_KEY;
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert(process.env.FIREBASE_ADMIN_KEY),
+    });
+    console.log("Firebase Admin initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize Firebase Admin:", error);
+    throw error;
+  }
 }
 
-export default admin;
+module.exports = admin;

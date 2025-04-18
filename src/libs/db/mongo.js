@@ -1,7 +1,7 @@
+require("dotenv").config({ path: ".env.local" });
 const mongoose = require("mongoose");
 
-let isConnected = false; // Track connection status
-
+let isConnected = false;
 async function connectToDatabase() {
   if (isConnected) {
     return mongoose.connection;

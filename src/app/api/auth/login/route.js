@@ -1,10 +1,9 @@
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { admin } from "@/libs/firebaseAdmin";
-import connectMongo from "@/libs/db/mongo";
+import admin from "@/libs/firebaseAdmin";
+import { connectToDatabase } from "@/libs/db/mongo";
 import User from "@/models/User";
 import { initializeApp } from "firebase/app";
 
-// Initialize Firebase Client SDK (for email/password login)
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -24,7 +23,7 @@ export async function POST(req) {
     let firebaseUser;
     let userData = {};
 
-    // Case 1: Email/Password Login
+    // Email/Password Login
     if (email && password) {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -32,15 +31,22 @@ export async function POST(req) {
         password
       );
       firebaseUser = userCredential.user;
+
+      // Get custom claims
+      const tokenResult = await firebaseUser.getIdTokenResult();
+      const role = tokenResult.claims.role || "user"; // Fallback to "user"
+
       userData = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
-        name: firebaseUser.displayName || email.split("@")[0], // Use displayName or email prefix
+        name: firebaseUser.displayName,
+        role, // Include role from custom claims
       };
     }
-    // Case 2: Google Auth
+    // Google Auth
     else if (token) {
       const decoded = await admin.auth().verifyIdToken(token);
+      const role = decoded.role || "user"; // Fallback to "user"
       firebaseUser = {
         uid: decoded.uid,
         email: decoded.email,
@@ -50,24 +56,35 @@ export async function POST(req) {
         uid: decoded.uid,
         email: decoded.email,
         name: decoded.name,
+        role,
       };
     } else {
       return Response.json({ error: "Invalid credentials" }, { status: 400 });
     }
 
-    // Prevent duplicates by using uid as unique identifier
-    await connectMongo();
+    await connectToDatabase();
     const user = await User.findOneAndUpdate(
-      { uid: userData.uid }, // Search by uid only
-      userData,
+      { uid: userData.uid },
+      { ...userData, role: userData.role }, // Ensure role is updated
       {
         new: true,
         upsert: true,
         setDefaultsOnInsert: true,
       }
-    );
+    ).populate("restaurantId");
 
-    return Response.json(user, { status: 200 });
+    // Check if restaurant account is approved
+    if (user.role === "restaurant" && user.status !== "approved") {
+      return Response.json(
+        { error: "Your restaurant account is pending approval" },
+        { status: 403 }
+      );
+    }
+
+    return Response.json(
+      { ...user.toObject(), role: userData.role },
+      { status: 200 }
+    );
   } catch (err) {
     console.error("Login error:", err);
     return Response.json(

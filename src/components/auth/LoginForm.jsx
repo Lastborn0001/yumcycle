@@ -12,7 +12,14 @@ import {
 } from "firebase/auth";
 import { app } from "@/libs/firebase-client";
 import { toast, Toaster } from "react-hot-toast";
-import { FiUser, FiMail, FiLock, FiArrowRight } from "react-icons/fi";
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+  FiArrowRight,
+  FiHome,
+  FiBriefcase,
+} from "react-icons/fi";
 
 export default function AuthForms() {
   const router = useRouter();
@@ -20,14 +27,34 @@ export default function AuthForms() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
+  // Restaurant-specific fields
+  const [restaurantName, setRestaurantName] = useState("");
+  const [restaurantAddress, setRestaurantAddress] = useState("");
+  const [restaurantCuisine, setRestaurantCuisine] = useState("");
+
   useEffect(() => {
     const auth = getAuth(app);
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        router.push("/dashboard");
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          const role = tokenResult.claims.role;
+          console.log("User role:", role); // Debug log
+
+          if (role === "admin") {
+            router.push("/admin/dashboard");
+          } else if (role === "restaurant") {
+            router.push("/restaurant/dashboard");
+          } else {
+            router.push("/dashboard");
+          }
+        } catch (error) {
+          console.error("Error fetching token result:", error);
+        }
       }
       setAuthChecked(true);
     });
@@ -42,16 +69,51 @@ export default function AuthForms() {
 
     try {
       if (isLogin) {
+        // Login logic
         await signInWithEmailAndPassword(auth, email, password);
         toast.success("Logged in successfully!");
       } else {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
+        // Registration logic
+        const registrationData = {
           email,
-          password
-        );
-        await updateProfile(userCredential.user, { displayName: name });
-        toast.success("Account created successfully!");
+          password,
+          name,
+          role,
+        };
+
+        // Add restaurant data if registering as restaurant
+        if (role === "restaurant") {
+          registrationData.restaurantData = {
+            name: restaurantName,
+            address: restaurantAddress,
+            cuisine: restaurantCuisine.split(",").map((c) => c.trim()),
+          };
+        }
+
+        // Send registration data to backend
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(registrationData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Registration failed");
+        }
+
+        const userData = await response.json();
+
+        if (role === "restaurant") {
+          toast.success("Restaurant registration submitted for approval!");
+        } else {
+          toast.success("Account created successfully!");
+        }
+
+        // Sign in the user after successful registration
+        await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err) {
       toast.error(err.message || "Authentication failed");
@@ -66,7 +128,6 @@ export default function AuthForms() {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       toast.success("Logged in with Google!");
-      router.push("/dashboard");
     } catch (err) {
       toast.error(err.message || "Google login failed");
     } finally {
@@ -92,30 +153,136 @@ export default function AuthForms() {
         <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {!isLogin && (
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Full Name
-                </label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FiUser className="h-5 w-5 text-gray-400" />
+              <>
+                <div>
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Full Name
+                  </label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FiUser className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      autoComplete="name"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                      placeholder="Lois Olamide"
+                    />
                   </div>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-                    placeholder="Lois Olamide"
-                  />
                 </div>
-              </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Account Type
+                  </label>
+                  <div className="mt-1 grid grid-cols-3 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setRole("user")}
+                      className={`py-2 px-3 border rounded-md text-sm font-medium flex items-center justify-center ${
+                        role === "user"
+                          ? "bg-orange-100 border-orange-300 text-orange-700"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      <FiUser className="mr-2" /> User
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole("restaurant")}
+                      className={`py-2 px-3 border rounded-md text-sm font-medium flex items-center justify-center ${
+                        role === "restaurant"
+                          ? "bg-orange-100 border-orange-300 text-orange-700"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      <FiBriefcase className="mr-2" /> Restaurant
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRole("admin")}
+                      className={`py-2 px-3 border rounded-md text-sm font-medium flex items-center justify-center ${
+                        role === "admin"
+                          ? "bg-orange-100 border-orange-300 text-orange-700"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                      disabled
+                      title="Admin accounts can only be created by existing admins"
+                    >
+                      <FiHome className="mr-2" /> Admin
+                    </button>
+                  </div>
+                </div>
+
+                {role === "restaurant" && (
+                  <>
+                    <div>
+                      <label
+                        htmlFor="restaurantName"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Restaurant Name
+                      </label>
+                      <input
+                        id="restaurantName"
+                        name="restaurantName"
+                        type="text"
+                        required
+                        value={restaurantName}
+                        onChange={(e) => setRestaurantName(e.target.value)}
+                        className="mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                        placeholder="Delicious Eats"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="restaurantAddress"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Restaurant Address
+                      </label>
+                      <input
+                        id="restaurantAddress"
+                        name="restaurantAddress"
+                        type="text"
+                        required
+                        value={restaurantAddress}
+                        onChange={(e) => setRestaurantAddress(e.target.value)}
+                        className="mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                        placeholder="123 Main St, City"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="restaurantCuisine"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Cuisine Types (comma separated)
+                      </label>
+                      <input
+                        id="restaurantCuisine"
+                        name="restaurantCuisine"
+                        type="text"
+                        required
+                        value={restaurantCuisine}
+                        onChange={(e) => setRestaurantCuisine(e.target.value)}
+                        className="mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
+                        placeholder="Nigerian, African, Continental"
+                      />
+                    </div>
+                  </>
+                )}
+              </>
             )}
 
             <div>
