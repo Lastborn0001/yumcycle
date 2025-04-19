@@ -20,40 +20,19 @@ async function verifyRestaurantOwner(token) {
 }
 
 export async function GET(req) {
-  console.log("Handling GET /api/restaurant");
+  console.log("Handling GET /api/restaurants");
   try {
-    const token = req.headers.get("authorization")?.split("Bearer ")[1];
-    if (!token) {
-      console.log("No token provided");
-      throw new Error("Authorization token missing");
-    }
-
     await connectToDatabase();
-    const { uid } = await verifyRestaurantOwner(token);
-
-    console.log("Querying restaurant for uid:", uid);
-    const restaurant = await RestaurantProfile.findOne({ userId: uid }).lean();
-    if (!restaurant) {
-      console.log("Restaurant not found for uid:", uid);
-      return Response.json({ error: "Restaurant not found" }, { status: 404 });
-    }
-
-    console.log("Restaurant found:", restaurant._id);
-    return Response.json(restaurant, { status: 200 });
+    const restaurants = await RestaurantProfile.find({
+      status: "approved",
+    }).lean();
+    console.log("Approved restaurants found:", restaurants.length);
+    return Response.json(restaurants, { status: 200 });
   } catch (error) {
-    console.error(
-      "Error fetching restaurant data:",
-      JSON.stringify(error, null, 2)
-    );
+    console.error("Error fetching restaurants:", error.message, error.stack);
     return Response.json(
-      { error: error.message || "Failed to fetch restaurant data" },
-      {
-        status: error.message.includes("Unauthorized")
-          ? 403
-          : error.message.includes("not found")
-          ? 404
-          : 500,
-      }
+      { error: "Failed to fetch restaurants" },
+      { status: 500 }
     );
   }
 }

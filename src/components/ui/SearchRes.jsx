@@ -1,11 +1,11 @@
 "use client";
 import { Clock, Map, Search, Truck, Leaf } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Add this import
+import { useRouter } from "next/navigation";
 import Button from "./Button";
 
 const SearchRes = () => {
-  const router = useRouter(); // Add router
+  const router = useRouter();
   const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,9 +18,16 @@ const SearchRes = () => {
       try {
         setLoading(true);
         const response = await fetch("/api/restaurants");
+        if (!response.ok) {
+          throw new Error("Failed to load restaurants");
+        }
         const data = await response.json();
-        setRestaurants(data);
-        setFilteredRestaurants(data);
+        // Filter approved restaurants
+        const approvedRestaurants = data.filter(
+          (restaurant) => restaurant.status === "approved"
+        );
+        setRestaurants(approvedRestaurants);
+        setFilteredRestaurants(approvedRestaurants);
       } catch (err) {
         setError("Failed to load restaurants");
         console.error(err);
@@ -113,13 +120,13 @@ const SearchRes = () => {
           <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-4">
             {filteredRestaurants.map((restaurant) => (
               <div
-                key={restaurant.id}
+                key={restaurant._id}
                 className="group w-full max-w-[400px] mx-auto overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 rounded-lg hover:rounded-xl cursor-pointer"
-                onClick={() => router.push(`/restaurants/${restaurant.id}`)} // Add navigation
+                onClick={() => router.push(`/restaurants/${restaurant._id}`)}
               >
                 <div className="relative">
                   <img
-                    src={restaurant.image}
+                    src={restaurant.image || "/placeholder-restaurant.jpg"}
                     alt={restaurant.name}
                     className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

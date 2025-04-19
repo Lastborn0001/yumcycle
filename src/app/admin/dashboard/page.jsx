@@ -9,13 +9,16 @@ import {
   Check,
   X,
   Trash2,
+  LogOut, // Add LogOut icon
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth"; // Add signOut
 import { app } from "@/libs/firebase-client";
 import { toast, Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation"; // Add useRouter
 
 const AdminDashboard = () => {
+  const router = useRouter(); // Add router
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,6 +33,15 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    const auth = getAuth(app);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+      fetchRestaurants();
+    });
+
     const fetchRestaurants = async () => {
       try {
         setLoading(true);
@@ -59,7 +71,8 @@ const AdminDashboard = () => {
     };
 
     fetchRestaurants();
-  }, [activeTab]);
+    return () => unsubscribe();
+  }, [activeTab, router]);
 
   const handleApprove = async (restaurantId, userId) => {
     if (processing.has(restaurantId)) return;
@@ -183,6 +196,18 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth(app);
+      await signOut(auth);
+      toast.success("Logged out successfully!");
+      router.push("/login");
+    } catch (err) {
+      toast.error("Failed to log out: " + err.message);
+      console.error("Logout error:", err);
+    }
+  };
+
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(""), 5000);
@@ -207,8 +232,15 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <Toaster position="top-center" />
-      <header className="bg-orange-500 text-white p-4">
+      <header className="bg-orange-500 text-white p-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <button
+          onClick={handleLogout}
+          className="p-2 rounded-full bg-orange-600 hover:bg-orange-700 text-white"
+          title="Log Out"
+        >
+          <LogOut className="h-6 w-6" />
+        </button>
       </header>
       <main className="xl:w-[80%] p-9 w-full m-auto">
         <div className="mb-8">

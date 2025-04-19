@@ -24,8 +24,37 @@ const Nav = () => {
   const auth = getAuth(app);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const token = await firebaseUser.getIdToken();
+          const response = await fetch("/api/users/profile", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.ok) {
+            const userData = await response.json();
+            const mergedUser = {
+              ...firebaseUser,
+              name: userData.name || firebaseUser.displayName,
+              email: userData.email || firebaseUser.email,
+              photoURL: userData.photoURL || firebaseUser.photoURL,
+            };
+            setUser(mergedUser);
+            console.log("Nav user:", {
+              name: mergedUser.name,
+              email: mergedUser.email,
+              photoURL: mergedUser.photoURL,
+            });
+          } else {
+            throw new Error("Failed to fetch profile");
+          }
+        } catch (err) {
+          console.error("Fetch profile error in Nav:", err);
+          setUser(firebaseUser); // Fallback to Firebase data
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
     return () => unsubscribe();

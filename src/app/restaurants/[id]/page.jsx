@@ -4,17 +4,17 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Nav from "@/components/layout/Nav";
+import Footer from "@/components/layout/Footer";
 
 const RestaurantPage = () => {
-  const params = useParams(); // Get dynamic params
-  const id = params.id; // Get restaurant ID from URL
+  const params = useParams();
+  const id = params.id;
   const [restaurant, setRestaurant] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch restaurant and menu items
   useEffect(() => {
     if (!id) return;
 
@@ -23,17 +23,21 @@ const RestaurantPage = () => {
         setLoading(true);
 
         // Fetch restaurant
-        const restaurantResponse = await fetch(`/api/restaurants?id=${id}`);
+        const restaurantResponse = await fetch(`/api/restaurants/${id}`);
         if (!restaurantResponse.ok) {
-          throw new Error("Restaurant not found");
+          const errorData = await restaurantResponse.json();
+          throw new Error(errorData.error || "Restaurant not found");
         }
         const restaurantData = await restaurantResponse.json();
         setRestaurant(restaurantData);
 
         // Fetch menu items
-        const menuResponse = await fetch(`/api/menu-items?restaurantId=${id}`);
+        const menuResponse = await fetch(
+          `/api/restaurants/menu?restaurantId=${id}`
+        );
         if (!menuResponse.ok) {
-          throw new Error("Failed to load menu items");
+          const errorData = await menuResponse.json();
+          throw new Error(errorData.error || "Failed to load menu items");
         }
         const menuData = await menuResponse.json();
         setMenuItems(menuData);
@@ -48,7 +52,6 @@ const RestaurantPage = () => {
     fetchData();
   }, [id]);
 
-  // Add item to cart
   const addToCart = (item) => {
     setCart((prevCart) => [...prevCart, { ...item, quantity: 1 }]);
     alert(`${item.name} added to cart!`);
@@ -63,11 +66,10 @@ const RestaurantPage = () => {
   return (
     <>
       <Nav />
-      {/* Restaurant Header */}
       <section className="mb-8 xl:w-[80%] p-9 w-full m-auto relative py-12 md:py-24">
         <div className="relative">
           <img
-            src={restaurant.image}
+            src={restaurant.image || "/placeholder-restaurant.jpg"}
             alt={restaurant.name}
             className="h-64 w-full object-cover rounded-lg"
           />
@@ -128,7 +130,6 @@ const RestaurantPage = () => {
         </div>
       </section>
 
-      {/* Menu Section */}
       <section className="mb-8 xl:w-[80%] p-9 w-full m-auto">
         <h2 className="mb-4 text-xl font-semibold">Menu</h2>
         {menuItems.length === 0 ? (
@@ -139,12 +140,12 @@ const RestaurantPage = () => {
           <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
             {menuItems.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className="group w-full max-w-[400px] mx-auto overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
               >
                 <div className="relative">
                   <img
-                    src={item.image || "/placeholder-food.jpg"} // Fallback image
+                    src={item.image || "/placeholder-food.jpg"}
                     alt={item.name}
                     className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
@@ -175,7 +176,6 @@ const RestaurantPage = () => {
         )}
       </section>
 
-      {/* Cart Summary (Optional) */}
       {cart.length > 0 && (
         <section className="mb-8 xl:w-[80%] p-9 w-full m-auto">
           <h2 className="mb-4 text-xl font-semibold">
@@ -198,6 +198,7 @@ const RestaurantPage = () => {
           </div>
         </section>
       )}
+      <Footer />
     </>
   );
 };

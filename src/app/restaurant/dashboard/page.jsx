@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth"; // Add signOut
 import { app } from "@/libs/firebase-client";
 import {
   Clock,
@@ -11,12 +11,14 @@ import {
   CheckCircle,
   XCircle,
   Plus,
+  LogOut, // Add LogOut icon
 } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import OrderCard from "@/components/ui/OrderCard";
 import MenuItemForm from "@/components/ui/MenuItemForm";
 import MenuItemList from "@/components/ui/MenuItemList";
 import NotificationList from "@/components/ui/NotificationList";
+import ProfileEditModal from "@/components/ui/ProfileEditModal";
 
 export default function RestaurantDashboard() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function RestaurantDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [restaurant, setRestaurant] = useState(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -38,31 +41,22 @@ export default function RestaurantDashboard() {
 
       try {
         const token = await user.getIdToken();
-        const [restaurantRes, ordersRes, menuRes, notificationsRes] =
+        const [profileRes, ordersRes, menuRes, notificationsRes] =
           await Promise.all([
-            fetch("/api/restaurants", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+            fetch("/api/restaurants/profile", {
+              headers: { Authorization: `Bearer ${token}` },
             }),
             fetch("/api/restaurants/orders", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }),
             fetch("/api/restaurants/menu", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }),
             fetch("/api/restaurants/notifications", {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+              headers: { Authorization: `Bearer ${token}` },
             }),
           ]);
 
-        // Helper to parse response
         const parseResponse = async (res, errorMessage) => {
           if (!res.ok) {
             const contentType = res.headers.get("content-type");
@@ -110,9 +104,9 @@ export default function RestaurantDashboard() {
           return JSON.parse(text);
         };
 
-        const restaurantData = await parseResponse(
-          restaurantRes,
-          "Failed to fetch restaurant data"
+        const profileData = await parseResponse(
+          profileRes,
+          "Failed to fetch restaurant profile"
         );
         const ordersData = await parseResponse(
           ordersRes,
@@ -127,7 +121,7 @@ export default function RestaurantDashboard() {
           "Failed to fetch notifications"
         );
 
-        setRestaurant(restaurantData);
+        setRestaurant(profileData);
         setOrders(ordersData);
         setMenuItems(menuData);
         setNotifications(notificationsData);
@@ -184,9 +178,7 @@ export default function RestaurantDashboard() {
 
       const response = await fetch("/api/restaurants/menu", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
@@ -197,9 +189,15 @@ export default function RestaurantDashboard() {
 
       const newItem = await response.json();
       setMenuItems([...menuItems, newItem]);
+      toast.success("Menu item added!");
     } catch (err) {
+      toast.error(err.message || "Failed to add menu item");
       throw err;
     }
+  };
+
+  const handleProfileUpdate = (updatedProfile) => {
+    setRestaurant(updatedProfile);
   };
 
   const markNotificationAsRead = async (notificationId) => {
@@ -236,6 +234,18 @@ export default function RestaurantDashboard() {
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth(app);
+      await signOut(auth);
+      toast.success("Logged out successfully!");
+      router.push("/login");
+    } catch (err) {
+      toast.error("Failed to log out: " + err.message);
+      console.error("Logout error:", err);
     }
   };
 
@@ -282,6 +292,12 @@ export default function RestaurantDashboard() {
           </h1>
           <div className="flex items-center space-x-4">
             <button
+              onClick={() => setIsProfileModalOpen(true)}
+              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            >
+              Edit Profile
+            </button>
+            <button
               onClick={() => setActiveTab("notifications")}
               className="relative p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
@@ -290,11 +306,47 @@ export default function RestaurantDashboard() {
                 <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full"></span>
               )}
             </button>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              title="Log Out"
+            >
+              <LogOut className="h-6 w-6" />
+            </button>
           </div>
         </div>
       </header>
 
+      <ProfileEditModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        restaurant={restaurant}
+        onProfileUpdate={handleProfileUpdate}
+      />
+
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div className="bg-white shadow rounded-lg p-6 mb-6">
+          <div className="flex items-center space-x-4">
+            {restaurant.image ? (
+              <img
+                src={restaurant.image}
+                alt={restaurant.name}
+                className="w-24 h-24 object-cover rounded-full"
+              />
+            ) : (
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+                <span className="text-gray-500">No Image</span>
+              </div>
+            )}
+            <div>
+              <h2 className="text-xl font-semibold">{restaurant.name}</h2>
+              <p className="text-gray-600">
+                Eco-Friendly: {restaurant.isEcoFriendly ? "Yes" : "No"}
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
             <button

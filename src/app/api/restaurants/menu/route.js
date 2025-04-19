@@ -4,7 +4,6 @@ import MenuItem from "@/models/MenuItem";
 import User from "@/models/User";
 import admin from "@/libs/firebaseAdmin";
 import { uploadImage } from "@/libs/utils/cloudinary";
-import { Readable } from "stream";
 
 async function verifyRestaurantOwner(token) {
   console.log("Verifying token for menu:", token?.slice(0, 20) + "...");
@@ -25,15 +24,41 @@ async function verifyRestaurantOwner(token) {
 export async function GET(req) {
   console.log("Handling GET /api/restaurants/menu");
   try {
+    await connectToDatabase();
+    const { searchParams } = new URL(req.url);
+    const restaurantId = searchParams.get("restaurantId");
+
+    if (restaurantId) {
+      // Public access for users
+      const restaurant = await RestaurantProfile.findOne({
+        _id: restaurantId,
+        status: "approved",
+      });
+      if (!restaurant) {
+        console.log("Restaurant not found or not approved:", restaurantId);
+        return Response.json(
+          { error: "Restaurant not found or not approved" },
+          { status: 404 }
+        );
+      }
+      const menuItems = await MenuItem.find({
+        restaurant: restaurantId,
+      }).lean();
+      console.log("Menu items found for restaurant:", menuItems.length);
+      return Response.json(menuItems, { status: 200 });
+    }
+
+    // Authenticated access for restaurant owners
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token) {
       console.log("No token provided");
-      throw new Error("Authorization token missing");
+      return Response.json(
+        { error: "Authorization token missing" },
+        { status: 401 }
+      );
     }
 
-    await connectToDatabase();
     const { uid } = await verifyRestaurantOwner(token);
-
     const restaurant = await RestaurantProfile.findOne({ userId: uid });
     console.log("Restaurant found:", restaurant ? restaurant._id : "none");
     if (!restaurant) {
@@ -120,7 +145,6 @@ export async function POST(req) {
       );
     }
 
-    // Validate price as a number
     const parsedPrice = parseFloat(price);
     if (isNaN(parsedPrice) || parsedPrice < 0) {
       console.log("Invalid price:", price);
