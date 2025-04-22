@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, signOut } from "firebase/auth"; // Add signOut
+import { getAuth, signOut } from "firebase/auth";
 import { app } from "@/libs/firebase-client";
 import {
   Clock,
@@ -11,7 +11,7 @@ import {
   CheckCircle,
   XCircle,
   Plus,
-  LogOut, // Add LogOut icon
+  LogOut,
 } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import OrderCard from "@/components/ui/OrderCard";
@@ -58,50 +58,61 @@ export default function RestaurantDashboard() {
           ]);
 
         const parseResponse = async (res, errorMessage) => {
+          const contentType = res.headers.get("content-type");
+          const text = await res.text();
+
           if (!res.ok) {
-            const contentType = res.headers.get("content-type");
-            const text = await res.text();
             if (!text) {
               if (res.status === 405) {
-                throw new Error(
-                  `${errorMessage}: Method not allowed (status ${res.status})`
-                );
+                throw new Error(`${errorMessage}: Method not allowed`);
               }
               if (res.status === 403) {
                 throw new Error(
-                  `${errorMessage}: Access forbidden - restaurant may not be approved (status ${res.status})`
+                  `${errorMessage}: Access forbidden - restaurant may not be approved`
                 );
+              }
+              if (res.status === 404) {
+                throw new Error(`${errorMessage}: Resource not found`);
               }
               throw new Error(
                 `${errorMessage}: Empty response (status ${res.status})`
               );
             }
+
             if (contentType?.includes("application/json")) {
               try {
-                const errorData = JSON.parse(text);
-                throw new Error(errorData.error || errorMessage);
+                const data = JSON.parse(text);
+                throw new Error(data.error || `${errorMessage}: Unknown error`);
               } catch (e) {
+                console.error("Invalid JSON response:", text);
                 throw new Error(
-                  `${errorMessage}: Invalid JSON - ${text.slice(0, 50)}...`
+                  `${errorMessage}: Invalid JSON - ${text.slice(0, 50)}`
                 );
               }
             } else {
               throw new Error(
-                `${errorMessage}: Non-JSON response - ${text.slice(0, 50)}...`
+                `${errorMessage}: Non-JSON response - ${text.slice(0, 50)}`
               );
             }
           }
-          const contentType = res.headers.get("content-type");
+
           if (!contentType?.includes("application/json")) {
             throw new Error(
               `${errorMessage}: Expected JSON, got ${contentType}`
             );
           }
-          const text = await res.text();
           if (!text) {
             throw new Error(`${errorMessage}: Empty JSON response`);
           }
-          return JSON.parse(text);
+
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            console.error("Invalid JSON response:", text);
+            throw new Error(
+              `${errorMessage}: Invalid JSON - ${text.slice(0, 50)}`
+            );
+          }
         };
 
         const profileData = await parseResponse(

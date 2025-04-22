@@ -307,9 +307,7 @@ const CartPage = () => {
                     <Button
                       className="mt-6 w-full gap-2 bg-orange-500 text-white cursor-pointer hover:bg-orange-400"
                       size="lg"
-                      onClick={() =>
-                        toast.error("Proceed to checkout (not implemented)")
-                      }
+                      onClick={() => router.push("/checkout")}
                     >
                       <CreditCard className="h-4 w-4" />
                       <span>Proceed to Checkout</span>

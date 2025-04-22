@@ -1,120 +1,111 @@
 import { connectToDatabase } from "@/libs/db/mongo";
-import RestaurantProfile from "@/models/RestaurantProfile";
 import Notification from "@/models/Notification";
-import User from "@/models/User";
 import admin from "@/libs/firebaseAdmin";
+import mongoose from "mongoose";
+import { NextResponse } from "next/server";
 
-async function verifyRestaurantOwner(token) {
-  console.log(
-    "Verifying token for notifications:",
-    token?.slice(0, 20) + "..."
-  );
+async function getAuthenticatedUser(req) {
   try {
+    const token = req.headers.get("authorization")?.split(" ")[1];
+    if (!token) throw new Error("Authorization token missing");
     const decoded = await admin.auth().verifyIdToken(token);
-    const user = await User.findOne({ uid: decoded.uid });
-    if (!user || user.role !== "restaurant") {
-      throw new Error("Unauthorized: Restaurant owner access required");
-    }
-    return { user, uid: decoded.uid };
+    console.log("Authenticated user:", decoded);
+    return decoded;
   } catch (error) {
-    console.error("Verification error:", error);
-    throw new Error(error.message || "Invalid or expired token");
+    console.error("getAuthenticatedUser error:", error);
+    return NextResponse.json(
+      { error: "Unauthorized: Invalid or missing token" },
+      { status: 401 }
+    );
   }
 }
 
 export async function GET(req) {
-  console.log("Handling GET /api/restaurants/notifications");
   try {
-    const token = req.headers.get("authorization")?.split("Bearer ")[1];
-    if (!token) {
-      console.log("No token provided");
-      throw new Error("Authorization token missing");
-    }
-
     await connectToDatabase();
-    const { uid } = await verifyRestaurantOwner(token);
+    const decoded = await getAuthenticatedUser(req);
+    if (decoded instanceof NextResponse) return decoded; // Handle unauthorized
 
-    const restaurant = await RestaurantProfile.findOne({ userId: uid }).lean();
+    // Find restaurant by userId
+    const restaurant = await mongoose.models.RestaurantProfile.findOne({
+      userId: decoded.uid,
+    });
     if (!restaurant) {
-      console.log("Restaurant not found for uid:", uid);
-      return Response.json({ error: "Restaurant not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Restaurant not found for this user" },
+        { status: 404 }
+      );
     }
 
-    console.log("Querying notifications for restaurant:", restaurant._id);
     const notifications = await Notification.find({
-      restaurant: restaurant._id,
-    }).lean();
-    console.log("Notifications found:", notifications.length);
+      restaurantId: restaurant._id,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    return Response.json(notifications, { status: 200 });
-  } catch (error) {
-    console.error(
-      "Error fetching notifications:",
-      JSON.stringify(error, null, 2)
+    console.log(
+      `Fetched ${notifications.length} notifications for restaurant ${restaurant._id}`
     );
-    return Response.json(
+
+    return NextResponse.json(notifications);
+  } catch (error) {
+    console.error("GET /api/restaurants/notifications error:", error);
+    return NextResponse.json(
       { error: error.message || "Failed to fetch notifications" },
-      {
-        status: error.message.includes("Unauthorized")
-          ? 403
-          : error.message.includes("not found")
-          ? 404
-          : 500,
-      }
+      { status: 500 }
     );
   }
 }
 
 export async function PUT(req) {
-  console.log("Handling PUT /api/restaurants/notifications");
   try {
-    const token = req.headers.get("authorization")?.split("Bearer ")[1];
-    if (!token) throw new Error("Authorization token missing");
-
     await connectToDatabase();
-    const { uid } = await verifyRestaurantOwner(token);
-
-    const restaurant = await RestaurantProfile.findOne({ userId: uid }).lean();
-    if (!restaurant) {
-      return Response.json({ error: "Restaurant not found" }, { status: 404 });
-    }
+    const decoded = await getAuthenticatedUser(req);
+    if (decoded instanceof NextResponse) return decoded; // Handle unauthorized
 
     const { id } = await req.json();
     if (!id) {
-      return Response.json(
-        { error: "Missing notification id" },
+      return NextResponse.json(
+        { error: "Notification ID required" },
         { status: 400 }
       );
     }
 
-    const notification = await Notification.findOneAndUpdate(
-      { _id: id, restaurant: restaurant._id },
-      { read: true },
-      { new: true }
-    ).lean();
-
-    if (!notification) {
-      return Response.json(
-        { error: "Notification not found" },
+    const restaurant = await mongoose.models.RestaurantProfile.findOne({
+      userId: decoded.uid,
+    });
+    if (!restaurant) {
+      return NextResponse.json(
+        { error: "Restaurant not found" },
         { status: 404 }
       );
     }
 
-    return Response.json(notification, { status: 200 });
-  } catch (error) {
-    console.error(
-      "Error updating notification:",
-      JSON.stringify(error, null, 2)
+    const notification = await Notification.findOne({
+      _id: id,
+      restaurantId: restaurant._id,
+    });
+
+    if (!notification) {
+      return NextResponse.json(
+        { error: "Notification not found or unauthorized" },
+        { status: 404 }
+      );
+    }
+
+    notification.read = true;
+    await notification.save();
+
+    console.log(
+      `Notification ${id} marked as read for restaurant ${restaurant._id}`
     );
-    return Response.json(
-      { error: error.message || "Failed to update notification" },
-      {
-        status: error.message.includes("Unauthorized")
-          ? 403
-          : error.message.includes("not found")
-          ? 404
-          : 500,
-      }
+
+    return NextResponse.json(notification);
+  } catch (error) {
+    console.error("PUT /api/restaurants/notifications error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to mark notification as read" },
+      { status: 500 }
     );
   }
 }

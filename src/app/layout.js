@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
         <CartInitializer />
         <ClientLayout>{children}</ClientLayout>
       </body>
+      <script src="https://js.paystack.co/v1/inline.js" async></script>
     </html>
   );
 }

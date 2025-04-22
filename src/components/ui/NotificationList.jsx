@@ -1,76 +1,59 @@
-"use client";
-import { Bell, CheckCircle, XCircle, Info } from "lucide-react";
-import { Buttons } from "@/components/ui/Buttons";
+import { Bell } from "lucide-react";
 
-export default function NotificationList({ notifications, onMarkAsRead }) {
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "order":
-        return <Bell className="h-5 w-5 text-blue-500" />;
-      case "system":
-        return <Info className="h-5 w-5 text-yellow-500" />;
-      case "promotion":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      default:
-        return <Bell className="h-5 w-5 text-gray-500" />;
-    }
-  };
-
+const NotificationList = ({ notifications, onMarkAsRead }) => {
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
-      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 className="text-lg font-medium leading-6 text-gray-900">
-          Notifications
-        </h3>
-      </div>
-      <div className="divide-y divide-gray-200">
-        {notifications.length === 0 ? (
-          <div className="px-4 py-5 sm:p-6 text-center text-gray-500">
-            No notifications
-          </div>
-        ) : (
-          notifications.map((notification) => (
-            <div
-              key={notification._id}
-              className={`px-4 py-4 sm:px-6 ${
-                !notification.read ? "bg-blue-50" : ""
-              }`}
-            >
-              <div className="flex items-start">
-                <div className="flex-shrink-0 pt-1">
-                  {getNotificationIcon(notification.type)}
-                </div>
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between">
-                    <p className="text-sm font-medium text-gray-900">
-                      {notification.title}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(notification.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {notification.message}
-                  </p>
-                  {!notification.read && (
-                    <Buttons
-                      variant="ghost"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => onMarkAsRead(notification._id)}
+    <div className="space-y-4">
+      {notifications.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">No notifications</div>
+      ) : (
+        notifications.map((notification) => (
+          <div
+            key={notification._id}
+            className={`rounded-lg border p-4 ${
+              notification.read ? "bg-gray-50" : "bg-white"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <Bell className="h-5 w-5 text-orange-500 mt-1" />
+              <div className="flex-1">
+                <p className="font-medium">{notification.message}</p>
+                <p className="text-sm text-gray-500">
+                  Order #{notification.orderId.slice(-6)} - Placed on{" "}
+                  {new Date(
+                    notification.orderDetails.createdAt
+                  ).toLocaleString()}
+                </p>
+                <div className="mt-2">
+                  {notification.orderDetails.items.map((item) => (
+                    <div
+                      key={item._id}
+                      className="flex justify-between text-sm text-gray-600"
                     >
-                      Mark as read
-                    </Buttons>
-                  )}
+                      <span>
+                        {item.name} x {item.quantity}
+                      </span>
+                      <span>₦{item.price * item.quantity}</span>
+                    </div>
+                  ))}
+                  <div className="mt-2 font-semibold">
+                    Total: ₦{notification.orderDetails.total}
+                  </div>
                 </div>
+                {!notification.read && (
+                  <button
+                    onClick={() => onMarkAsRead(notification._id)}
+                    className="mt-2 text-sm text-orange-500 hover:underline"
+                  >
+                    Mark as Read
+                  </button>
+                )}
               </div>
             </div>
-          ))
-        )}
-      </div>
+          </div>
+        ))
+      )}
     </div>
   );
-}
+};
+
+export default NotificationList;
