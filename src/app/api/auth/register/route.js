@@ -7,9 +7,8 @@ import admin from "@/libs/firebaseAdmin";
 import User from "@/models/User";
 import RestaurantProfile from "@/models/RestaurantProfile";
 import { initializeApp } from "firebase/app";
-import mongoose from "mongoose";
+import { connectToDatabase } from "@/libs/db/mongo";
 
-// Initialize Firebase Client
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -21,15 +20,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-console.log(process.env.MONGO_URI);
-// Database connection
-async function connectDB() {
-  if (mongoose.connection.readyState >= 1) return;
-  await mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-}
 
 export async function POST(request) {
   let firebaseUser = null;
@@ -51,7 +41,7 @@ export async function POST(request) {
     }
 
     // Check MongoDB first
-    await connectDB();
+    await connectToDatabase();
     if (await User.findOne({ email })) {
       return Response.json({ error: "Email already in use" }, { status: 409 });
     }
@@ -80,13 +70,14 @@ export async function POST(request) {
       updateProfile(firebaseUser, { displayName: name }),
     ]);
 
-    // Create user document
+    // Create user document with explicit cart
     const userData = {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
       name,
       role,
       status: role === "restaurant" ? "pending" : "approved",
+      cart: [], // Explicitly set cart
     };
 
     if (role === "restaurant") {
@@ -98,7 +89,21 @@ export async function POST(request) {
       userData.restaurantId = restaurantProfile._id;
     }
 
-    const user = await User.create(userData);
+    // Try Mongoose create
+    let user;
+    try {
+      user = await User.create(userData);
+      console.log("Created user (Mongoose):", user);
+    } catch (mongooseError) {
+      console.error("Mongoose create error:", mongooseError);
+      // Fallback to raw insert
+      user = await User.collection.insertOne(userData);
+      console.log("Created user (raw insert):", user);
+    }
+
+    // Verify raw database state
+    const rawUser = await User.collection.findOne({ uid: firebaseUser.uid });
+    console.log("Created user (raw):", rawUser);
 
     return Response.json(
       {

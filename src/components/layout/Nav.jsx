@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 import {
   Menu,
   X,
@@ -12,56 +12,86 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
-import { app } from "@/libs/firebase-client";
+import { signOut } from "firebase/auth";
+import { toast } from "react-hot-toast";
+import { useAuth } from "@/libs/AuthContext";
+import { useCartStore } from "@/store/cartStore";
 
-const Nav = () => {
+const selectCartItemCount = (state) => {
+  const items = state.items;
+  return Array.isArray(items) ? items.length : 0;
+};
+
+const Nav = memo(() => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const auth = getAuth(app);
+  const { user, loading, auth } = useAuth();
+  const cartItemCount = useCartStore(selectCartItemCount);
+  const fetchCart = useCartStore((state) => state.fetchCart);
+  const mergeCart = useCartStore((state) => state.mergeCart);
+  const cartStatus = useCartStore((state) => state.status);
+  const hasSyncedCart = useRef(false);
+  const hasFetchedCart = useRef(false);
+  const fetchFailed = useRef(false);
+  const isMounted = useRef(true);
+
+  console.log("Nav: Rendered", {
+    user: !!user,
+    loading,
+    cartItemCount,
+    cartStatus,
+  });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const token = await firebaseUser.getIdToken();
-          const response = await fetch("/api/users/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (response.ok) {
-            const userData = await response.json();
-            const mergedUser = {
-              ...firebaseUser,
-              name: userData.name || firebaseUser.displayName,
-              email: userData.email || firebaseUser.email,
-              photoURL: userData.photoURL || firebaseUser.photoURL,
-            };
-            setUser(mergedUser);
-            console.log("Nav user:", {
-              name: mergedUser.name,
-              email: mergedUser.email,
-              photoURL: mergedUser.photoURL,
-            });
-          } else {
-            throw new Error("Failed to fetch profile");
-          }
-        } catch (err) {
-          console.error("Fetch profile error in Nav:", err);
-          setUser(firebaseUser); // Fallback to Firebase data
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading || !user || cartStatus === "loading") {
+      console.log("Nav: Skipping syncCart", {
+        loading,
+        user: !!user,
+        cartStatus,
+      });
+      return;
+    }
+
+    const syncCart = async () => {
+      try {
+        const currentItems = useCartStore.getState().items;
+
+        // Only sync if we have local items and haven't synced yet
+        if (currentItems.length > 0 && !hasSyncedCart.current) {
+          console.log("Nav: Merging cart with", currentItems.length, "items");
+          hasSyncedCart.current = true;
+          await mergeCart(currentItems);
         }
-      } else {
-        setUser(null);
+
+        // Only fetch if we haven't fetched yet
+        if (!hasFetchedCart.current) {
+          console.log("Nav: Fetching cart");
+          hasFetchedCart.current = true;
+          await fetchCart();
+        }
+      } catch (err) {
+        console.error("Nav: Cart sync error:", err);
       }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, [auth]);
+    };
+
+    // const timer = setTimeout(() => {
+    // syncCart();
+    // }, 20000);
+
+    // return () => clearTimeout(timer);
+  }, [user, loading]);
 
   const handleNavigation = (path) => {
-    if (!user && path !== "/") {
+    if (!user && path !== "/" && path !== "/login") {
+      toast.error("Please log in to access this page");
       router.push("/login");
       return;
     }
@@ -71,9 +101,15 @@ const Nav = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      hasSyncedCart.current = false;
+      hasFetchedCart.current = false;
+      fetchFailed.current = false;
+      useCartStore.getState().resetFetchAttempts();
       router.push("/");
+      toast.success("Logged out successfully");
     } catch (error) {
       console.error("Logout error:", error);
+      toast.error("Failed to log out");
     }
   };
 
@@ -95,7 +131,6 @@ const Nav = () => {
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Desktop Navigation */}
         <ul className="hidden lg:flex justify-around pt-2">
           <li
             onClick={() => handleNavigation("/dashboard")}
@@ -123,7 +158,6 @@ const Nav = () => {
           </li>
         </ul>
 
-        {/* Desktop Right Side */}
         <div className="hidden lg:flex items-center gap-4">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -134,11 +168,16 @@ const Nav = () => {
             />
           </div>
 
-          <button className="relative rounded-full p-3 cursor-pointer border-[2px] border-gray-50 transition hover:bg-green-300">
+          <button
+            onClick={() => handleNavigation("/cart")}
+            className="relative rounded-full p-3 cursor-pointer border-[2px] border-gray-50 transition hover:bg-green-300"
+          >
             <ShoppingCartIcon className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center bg-orange-400 text-white justify-center rounded-full text-[10px]">
-              3
-            </span>
+            {cartItemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center bg-orange-400 text-white justify-center rounded-full text-[10px]">
+                {cartItemCount}
+              </span>
+            )}
           </button>
 
           {!loading && (
@@ -212,7 +251,6 @@ const Nav = () => {
           )}
         </div>
 
-        {/* Mobile Offcanvas Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <>
@@ -221,14 +259,13 @@ const Nav = () => {
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ type: "tween" }}
-                className="fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-xl "
+                className="fixed top-0 right-0 h-full w-64 bg-white z-50 shadow-xl"
               >
                 <div className="p-4 flex justify-end">
                   <button onClick={() => setIsMobileMenuOpen(false)}>
                     <X className="h-6 w-6" />
                   </button>
                 </div>
-
                 <div className="p-4 space-y-6 bg-white">
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -238,7 +275,6 @@ const Nav = () => {
                       className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300"
                     />
                   </div>
-
                   <ul className="space-y-4">
                     <li
                       onClick={() => handleNavigation("/dashboard")}
@@ -265,7 +301,6 @@ const Nav = () => {
                       My Orders
                     </li>
                   </ul>
-
                   <div className="pt-4 border-t border-gray-200">
                     {user ? (
                       <>
@@ -311,8 +346,6 @@ const Nav = () => {
                   </div>
                 </div>
               </motion.div>
-
-              {/* Overlay */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.5 }}
@@ -324,7 +357,6 @@ const Nav = () => {
           )}
         </AnimatePresence>
 
-        {/* Click outside to close dropdown */}
         {isDropdownOpen && (
           <div
             className="fixed inset-0 z-40"
@@ -334,6 +366,8 @@ const Nav = () => {
       </div>
     </nav>
   );
-};
+});
+
+Nav.displayName = "Nav";
 
 export default Nav;

@@ -1,24 +1,37 @@
-require("dotenv").config({ path: ".env.local" });
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-let isConnected = false;
-async function connectToDatabase() {
-  if (isConnected) {
-    return mongoose.connection;
-  }
+const MONGODB_URI = process.env.MONGO_URI;
 
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    isConnected = true;
-    console.log("Connected to MongoDB");
-    return mongoose.connection;
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    throw error;
-  }
+if (!MONGODB_URI) {
+  throw new Error("Please define the MONGODB_URI environment variable");
 }
 
-module.exports = { connectToDatabase };
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectToDatabase() {
+  if (cached.conn) {
+    console.log("Using cached MongoDB connection");
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: true,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      console.log("MongoDB connected");
+      mongoose.set("debug", true); // Enable debug mode
+      return mongoose;
+    });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+export { connectToDatabase };

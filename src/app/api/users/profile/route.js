@@ -36,7 +36,7 @@ export async function GET(req) {
 
     await connectToDatabase();
     const { user } = await verifyUser(token);
-
+    console.log(token);
     console.log("Profile fetched:", user._id);
     return Response.json(user, { status: 200 });
   } catch (error) {

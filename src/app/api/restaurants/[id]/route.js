@@ -3,7 +3,7 @@ import RestaurantProfile from "@/models/RestaurantProfile";
 import mongoose from "mongoose";
 
 export async function GET(req, { params }) {
-  console.log(`Handling GET /api/restaurants/${params.id}`);
+  // console.log(`Handling GET /api/restaurants/${params.id}`);
   try {
     await connectToDatabase();
 
