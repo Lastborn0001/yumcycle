@@ -12,13 +12,16 @@ import { CreditCard } from "lucide-react";
 
 const CheckoutPage = () => {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { firebaseUser, loading } = useAuth(); // Use firebaseUser for consistency
   const hasRedirected = useRef(false);
   const { items, status, initializeCart, clearCart } = useCartStore();
-  const [email, setEmail] = useState(user?.email || "");
+  const [email, setEmail] = useState(firebaseUser?.email || "");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
   const [paystackLoaded, setPaystackLoaded] = useState(false);
+  const [formError, setFormError] = useState(null);
 
-  // Ensure Paystack script is loaded
+  // Load Paystack script
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://js.paystack.co/v1/inline.js";
@@ -38,8 +41,32 @@ const CheckoutPage = () => {
     };
   }, []);
 
+  // Initialize cart and debug
+  useEffect(() => {
+    console.log("CheckoutPage: Auth state:", { firebaseUser, loading, status });
+    if (loading || hasRedirected.current) return;
+
+    if (!firebaseUser && !status.includes("loading")) {
+      console.log("No user, redirecting to /login");
+      hasRedirected.current = true;
+      toast.error("Please log in to checkout");
+      router.push("/login");
+      return;
+    }
+
+    if (firebaseUser && status === "idle") {
+      console.log("Initializing cart for user:", firebaseUser.uid);
+      initializeCart();
+    }
+  }, [firebaseUser, loading, status, initializeCart, router]);
+
+  // Log cart items whenever they change
+  useEffect(() => {
+    console.log("CheckoutPage: Cart items:", items);
+  }, [items]);
+
   const subtotal = items.reduce(
-    (total, item) => total + item.price * item.quantity,
+    (total, item) => total + (item.price * item.quantity || 0),
     0
   );
   const deliveryFee = 30;
@@ -49,29 +76,9 @@ const CheckoutPage = () => {
   const donation = 2;
   const total = subtotal + deliveryFee + serviceFee + tax + tip + donation;
 
-  useEffect(() => {
-    if (loading || hasRedirected.current || user !== null) return;
-
-    if (user === null && !status.includes("loading")) {
-      hasRedirected.current = true;
-      toast.error("Please log in to checkout");
-      router.push("/login");
-    }
-    if (user && status === "idle") {
-      initializeCart();
-    }
-  }, [user, loading, status, router, initializeCart]);
-
-  const getUserToken = async () => {
-    const { getAuth } = await import("firebase/auth");
-    const auth = getAuth();
-    const user = auth.currentUser;
-    return user ? await user.getIdToken() : null;
-  };
-
   const verifyPayment = async (reference) => {
     try {
-      const token = await getUserToken();
+      const token = await firebaseUser.getIdToken();
       if (!token) throw new Error("User not authenticated");
 
       const verifyResponse = await fetch("/api/payment", {
@@ -80,7 +87,7 @@ const CheckoutPage = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ reference }),
+        body: JSON.stringify({ reference, phoneNumber, address }),
       });
 
       if (!verifyResponse.ok) {
@@ -91,8 +98,10 @@ const CheckoutPage = () => {
       await clearCart();
       toast.dismiss();
       toast.success("Payment successful! Order placed.");
+      console.log(phoneNumber, address);
       router.push("/orders");
     } catch (error) {
+      console.error("Verify payment error:", error);
       toast.dismiss();
       toast.error(`Payment verification failed: ${error.message}`);
     }
@@ -105,6 +114,18 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (!phoneNumber || !address) {
+      setFormError("Phone number and address are required");
+      toast.error("Please provide your phone number and address");
+      return;
+    }
+
+    if (items.length === 0) {
+      setFormError("Your cart is empty");
+      toast.error("Your cart is empty");
+      return;
+    }
+
     if (!process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY) {
       console.error("Paystack public key missing");
       toast.error("Payment configuration error");
@@ -114,13 +135,13 @@ const CheckoutPage = () => {
     try {
       const handler = window.PaystackPop.setup({
         key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-        email: email || user?.email || "customer@example.com",
+        email: email || firebaseUser?.email || "customer@example.com",
         amount: total * 100, // Convert to kobo
         currency: "NGN",
         callback: (response) => {
           console.log("Paystack callback response:", response);
           toast.loading("Verifying payment...");
-          verifyPayment(response.reference); // Call verification separately
+          verifyPayment(response.reference);
         },
         onClose: () => {
           console.log("Paystack payment closed");
@@ -137,24 +158,12 @@ const CheckoutPage = () => {
     }
   };
 
-  if (status === "loading") {
-    return <div className="text-center py-8">Loading...</div>;
-  }
-
-  if (items.length === 0) {
+  if (loading || status === "loading") {
     return (
       <ClientLayout>
         <Nav />
         <main className="lg:w-[80%] p-5 w-full m-auto">
-          <div className="py-12 text-center">
-            <h2 className="text-xl font-semibold">Your cart is empty</h2>
-            <Button
-              className="mt-6"
-              onClick={() => router.push("/restaurants")}
-            >
-              Browse Restaurants
-            </Button>
-          </div>
+          <div className="py-12 text-center">Loading...</div>
         </main>
         <Footer />
       </ClientLayout>
@@ -169,87 +178,149 @@ const CheckoutPage = () => {
         <section>
           <div className="py-12 md:py-24">
             <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-            <div className="grid gap-8 xl:grid-cols-3">
-              <div className="xl:col-span-2">
-                <div className="rounded-lg border border-gray-300 p-6">
-                  <h2 className="mb-4 text-xl font-semibold">Order Details</h2>
-                  {items.map((item) => (
-                    <div key={item._id} className="flex justify-between mb-4">
-                      <div>
-                        <p className="font-medium">
-                          {item.name} x {item.quantity}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          From {item.restaurantName}
-                        </p>
+            {items.length === 0 ? (
+              <div className="text-center">
+                <h2 className="text-xl font-semibold">Your cart is empty</h2>
+                <Button
+                  className="mt-6"
+                  onClick={() => router.push("/restaurants")}
+                >
+                  Browse Restaurants
+                </Button>
+              </div>
+            ) : (
+              <div className="grid gap-8 xl:grid-cols-3">
+                <div className="xl:col-span-2">
+                  <div className="rounded-lg border border-gray-300 p-6">
+                    <h2 className="mb-4 text-xl font-semibold">
+                      Order Details
+                    </h2>
+                    {items.map((item) => (
+                      <div key={item._id} className="flex justify-between mb-4">
+                        <div>
+                          <p className="font-medium">
+                            {item.name} x {item.quantity}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            From {item.restaurantName}
+                          </p>
+                        </div>
+                        <p>₦{(item.price * item.quantity).toLocaleString()}</p>
                       </div>
-                      <p>₦{item.price * item.quantity}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="lg:col-span-1">
-                <div className="sticky top-20 rounded-lg border border-gray-300 p-6">
-                  <h2 className="mb-4 text-xl font-semibold">Order Summary</h2>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span>₦{subtotal}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Delivery Fee
-                      </span>
-                      <span>₦{deliveryFee}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Service Fee</span>
-                      <span>₦{serviceFee}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Tax</span>
-                      <span>₦{tax}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Tip</span>
-                      <span>₦{tip}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">
-                        Meal Donation
-                      </span>
-                      <span>₦{donation}</span>
-                    </div>
-                    <hr className="border-gray-300" />
-                    <div className="flex justify-between text-lg font-semibold">
-                      <span>Total</span>
-                      <span>₦{total}</span>
+                    ))}
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-2">
+                        Delivery Information
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label
+                            htmlFor="phoneNumber"
+                            className="block text-sm font-medium text-gray-700"
+                          >
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            id="phoneNumber"
+                            value={phoneNumber}
+                            onChange={(e) => setPhoneNumber(e.target.value)}
+                            className="mt-1 p-3 w-full border border-gray-300 rounded-md"
+                            placeholder="e.g., +2341234567890"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="address"
+                            className="block text-sm font-medium text-gray-700"
+                          >
+                            Delivery Address
+                          </label>
+                          <textarea
+                            id="address"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className="mt-1 p-3 w-full border border-gray-300 rounded-md"
+                            rows="4"
+                            placeholder="e.g., 123 Main St, Lagos, Nigeria"
+                            required
+                          />
+                        </div>
+                        {formError && (
+                          <p className="text-red-500 text-sm">{formError}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className="w-full p-3 border border-gray-300 rounded-md"
-                      required
-                    />
+                </div>
+                <div className="lg:col-span-1">
+                  <div className="sticky top-20 rounded-lg border border-gray-300 p-6">
+                    <h2 className="mb-4 text-xl font-semibold">
+                      Order Summary
+                    </h2>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Subtotal</span>
+                        <span>₦{subtotal.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Delivery Fee
+                        </span>
+                        <span>₦{deliveryFee.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          Service Fee
+                        </span>
+                        <span>₦{serviceFee.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Tax</span>
+                        <span>₦{tax.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Tip</span>
+                        <span>₦{tip.toLocaleString()}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">
+                          Meal Donation
+                        </span>
+                        <span>₦{donation.toLocaleString()}</span>
+                      </div>
+                      <hr className="border-gray-300" />
+                      <div className="flex justify-between text-lg font-semibold">
+                        <span>Total</span>
+                        <span>₦{total.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium mb-2">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        className="w-full p-3 border border-gray-300 rounded-md"
+                        required
+                      />
+                    </div>
+                    <Button
+                      className="mt-6 w-full bg-orange-500 text-white hover:bg-orange-400"
+                      onClick={handlePaystackPayment}
+                      disabled={!paystackLoaded || status === "loading"}
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Pay ₦{total.toLocaleString()}
+                    </Button>
                   </div>
-                  <Button
-                    className="mt-6 w-full bg-orange-500 text-white hover:bg-orange-400"
-                    onClick={handlePaystackPayment}
-                    disabled={!paystackLoaded}
-                  >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Pay ₦{total}
-                  </Button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
       </main>

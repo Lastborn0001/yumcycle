@@ -1,6 +1,6 @@
 import { connectToDatabase } from "@/libs/db/mongo";
-import Order from "@/models/Order";
 import admin from "@/libs/firebaseAdmin";
+import Order from "@/models/Order";
 import { NextResponse } from "next/server";
 
 async function getAuthenticatedUser(req) {
@@ -12,27 +12,28 @@ async function getAuthenticatedUser(req) {
     return decoded;
   } catch (error) {
     console.error("getAuthenticatedUser error:", error);
-    throw error;
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
 
 export async function GET(req) {
   try {
     await connectToDatabase();
-    const decoded = await getAuthenticatedUser(req);
+    const user = await getAuthenticatedUser(req);
+    if (user instanceof NextResponse) return user;
 
-    const orders = await Order.find({ userUid: decoded.uid })
+    // Fetch orders for this user
+    const orders = await Order.find({ userUid: user.uid })
       .sort({ createdAt: -1 })
       .lean();
-
-    console.log(`Fetched ${orders.length} orders for user ${decoded.uid}`);
+    console.log(`Fetched ${orders.length} orders for user ${user.uid}`);
 
     return NextResponse.json({ orders });
   } catch (error) {
     console.error("GET /api/orders error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch orders" },
-      { status: error.message.includes("Unauthorized") ? 401 : 500 }
+      { error: "Failed to fetch orders" },
+      { status: 500 }
     );
   }
 }

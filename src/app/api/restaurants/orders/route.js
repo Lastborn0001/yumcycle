@@ -1,3 +1,4 @@
+// app/api/restaurants/orders/route.js
 import { connectToDatabase } from "@/libs/db/mongo";
 import RestaurantProfile from "@/models/RestaurantProfile";
 import Order from "@/models/Order";
@@ -37,9 +38,16 @@ export async function GET(req) {
       return Response.json({ error: "Restaurant not found" }, { status: 404 });
     }
 
-    console.log("Querying orders for restaurant:", restaurant._id);
-    const orders = await Order.find({ restaurant: restaurant._id }).lean();
-    console.log("Orders found:", orders.length);
+    console.log("Querying orders for restaurant:", restaurant._id.toString());
+    const orders = await Order.find({ restaurantId: restaurant._id })
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .lean();
+    console.log(
+      "Orders found:",
+      orders.length,
+      "Order IDs:",
+      orders.map((o) => o._id.toString())
+    );
 
     return Response.json(orders, { status: 200 });
   } catch (error) {
@@ -80,7 +88,7 @@ export async function PUT(req) {
     }
 
     const order = await Order.findOneAndUpdate(
-      { _id: orderId, restaurant: restaurant._id },
+      { _id: orderId, restaurantId: restaurant._id },
       { status },
       { new: true }
     ).lean();
@@ -89,7 +97,7 @@ export async function PUT(req) {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
-    return Response.json(order, { status: 200 });
+    return Response.json({ success: true, order }, { status: 200 }); // Add success: true
   } catch (error) {
     console.error("Error updating order:", JSON.stringify(error, null, 2));
     return Response.json(

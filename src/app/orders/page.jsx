@@ -28,7 +28,7 @@ const OrderHistoryPage = () => {
         toast.error("Please log in to view your orders");
         router.push("/login");
       }
-    }, 500); // Wait 500ms to avoid race condition
+    }, 500);
 
     return () => clearTimeout(redirectTimeout);
   }, [firebaseUser, loading, router]);
@@ -42,11 +42,7 @@ const OrderHistoryPage = () => {
         console.log("Fetching orders for user:", {
           uid: firebaseUser.uid,
           email: firebaseUser.email,
-          hasGetIdToken: typeof firebaseUser.getIdToken === "function",
         });
-        if (typeof firebaseUser.getIdToken !== "function") {
-          throw new Error("Invalid Firebase user: getIdToken not available");
-        }
         const token = await firebaseUser.getIdToken();
         const response = await fetch("/api/orders", {
           headers: {
@@ -60,6 +56,7 @@ const OrderHistoryPage = () => {
         }
 
         const data = await response.json();
+        console.log("Fetched orders:", data.orders);
         setOrders(data.orders || []);
       } catch (err) {
         console.error("Fetch orders error:", err);
@@ -87,7 +84,7 @@ const OrderHistoryPage = () => {
     }
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <ClientLayout>
         <Nav />
@@ -123,7 +120,7 @@ const OrderHistoryPage = () => {
               <div className="rounded-lg border border-dashed p-12 text-center">
                 <Package className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
                 <h2 className="text-xl font-semibold">No orders yet</h2>
-                <p className="mt-2 text-muted-foreground">
+                <p className="text-muted-foreground">
                   Browse restaurants and place an order to get started.
                 </p>
                 <button
@@ -152,8 +149,14 @@ const OrderHistoryPage = () => {
                     <p className="text-sm text-gray-500 mb-2">
                       Placed on: {new Date(order.createdAt).toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 mb-2">
                       Restaurant: {order.items[0]?.restaurantName || "Unknown"}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-2">
+                      Phone: {order.phoneNumber || "Not provided"}
+                    </p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Address: {order.address || "Not provided"}
                     </p>
                     <div className="space-y-2 mb-4">
                       {order.items.map((item) => (
@@ -164,13 +167,15 @@ const OrderHistoryPage = () => {
                           <span>
                             {item.name} x {item.quantity}
                           </span>
-                          <span>₦{item.price * item.quantity}</span>
+                          <span>
+                            ₦{(item.price * item.quantity).toLocaleString()}
+                          </span>
                         </div>
                       ))}
                     </div>
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>
-                      <span>₦{order.total}</span>
+                      <span>₦{order.total.toLocaleString()}</span>
                     </div>
                   </div>
                 ))}

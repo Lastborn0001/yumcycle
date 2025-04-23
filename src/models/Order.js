@@ -1,39 +1,38 @@
 import mongoose from "mongoose";
 
-const orderItemSchema = new mongoose.Schema(
-  {
-    _id: { type: String, required: true },
-    name: { type: String, required: true },
-    price: { type: Number, required: true },
-    restaurantId: { type: String, required: true },
-    restaurantName: { type: String, required: true },
-    image: String,
-    category: String,
-    description: String,
-    quantity: { type: Number, default: 1 },
+const OrderSchema = new mongoose.Schema({
+  userUid: { type: String, required: true },
+  restaurantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RestaurantProfile",
+    required: true,
   },
-  { _id: false }
-);
-
-const orderSchema = new mongoose.Schema(
-  {
-    userUid: { type: String, required: true },
-    items: [orderItemSchema],
-    subtotal: { type: Number, required: true },
-    deliveryFee: { type: Number, default: 30 },
-    serviceFee: { type: Number, default: 40 },
-    tax: { type: Number, default: 300 },
-    tip: { type: Number, default: 400 },
-    donation: { type: Number, default: 2 },
-    total: { type: Number, required: true },
-    paymentIntentId: { type: String, required: true, unique: true },
-    status: {
-      type: String,
-      enum: ["pending", "completed", "failed", "cancelled"],
-      default: "pending",
+  items: [
+    {
+      _id: { type: String, required: true },
+      name: { type: String, required: true },
+      price: { type: Number, required: true },
+      quantity: { type: Number, required: true },
+      restaurantName: { type: String, required: true },
+      restaurantId: { type: String, required: true }, // String in items
     },
+  ],
+  subtotal: { type: Number, required: true },
+  deliveryFee: { type: Number, required: true },
+  serviceFee: { type: Number, required: true },
+  tax: { type: Number, required: true },
+  tip: { type: Number, required: true },
+  donation: { type: Number, required: true },
+  total: { type: Number, required: true },
+  phoneNumber: { type: String, required: true },
+  address: { type: String, required: true },
+  paymentIntentId: { type: String },
+  status: {
+    type: String,
+    enum: ["pending", "completed", "failed", "cancelled"],
+    default: "pending",
   },
-  { timestamps: true }
-);
+  createdAt: { type: Date, default: Date.now },
+});
 
-export default mongoose.models.Order || mongoose.model("Order", orderSchema);
+export default mongoose.models.Order || mongoose.model("Order", OrderSchema);
