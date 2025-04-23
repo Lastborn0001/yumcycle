@@ -124,13 +124,25 @@ const Nav = memo(() => {
             Yumcycle
           </h1>
         </div>
-        <button
-          className="lg:hidden mr-4"
-          onClick={() => setIsMobileMenuOpen(true)}
-        >
-          <Menu className="h-6 w-6" />
-        </button>
-
+        <div>
+          <button
+            onClick={() => handleNavigation("/cart")}
+            className="relative lg:hidden rounded-full p-3 cursor-pointer border-[2px] border-gray-50 transition hover:bg-green-300"
+          >
+            <ShoppingCartIcon className="h-5 w-5" />
+            {cartItemCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center bg-orange-400 text-white justify-center rounded-full text-[10px]">
+                {cartItemCount}
+              </span>
+            )}
+          </button>
+          <button
+            className="lg:hidden mr-4"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+        </div>
         <ul className="hidden lg:flex justify-around pt-2">
           <li
             onClick={() => handleNavigation("/dashboard")}

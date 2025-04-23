@@ -89,7 +89,9 @@ const OrderHistoryPage = () => {
       <ClientLayout>
         <Nav />
         <main className="lg:w-[80%] p-5 w-full m-auto">
-          <div className="py-12 text-center">Loading...</div>
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+          </div>
         </main>
         <Footer />
       </ClientLayout>
@@ -114,7 +116,7 @@ const OrderHistoryPage = () => {
       <main className="lg:w-[80%] p-5 w-full m-auto">
         <Toaster position="top-center" />
         <section>
-          <div className="py-12 md:py-24">
+          <div className="py-24 md:py-24">
             <h1 className="text-3xl font-bold mb-8">Your Orders</h1>
             {orders.length === 0 ? (
               <div className="rounded-lg border border-dashed p-12 text-center">

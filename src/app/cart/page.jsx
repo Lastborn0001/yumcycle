@@ -117,7 +117,11 @@ const CartPage = () => {
   };
 
   if (cartStatus === "loading") {
-    return <div className="text-center py-8">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
   }
 
   return (
@@ -126,7 +130,7 @@ const CartPage = () => {
       <main className="lg:w-[80%] p-5 w-full m-auto">
         <Toaster position="top-center" />
         <section>
-          <div className="py-12 md:py-24">
+          <div className="py-24 md:py-24">
             <div className="mb-8 flex items-center justify-between">
               <h1 className="text-3xl font-bold">Your Cart</h1>
               <p

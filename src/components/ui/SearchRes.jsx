@@ -57,7 +57,11 @@ const SearchRes = () => {
   const cuisines = [...new Set(restaurants.flatMap((r) => r.cuisine))];
 
   if (loading)
-    return <div className="text-center py-8">Loading restaurants...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
   if (error)
     return <div className="text-center py-8 text-red-500">{error}</div>;
 

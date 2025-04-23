@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-cloud/dialogflow": "^7.0.1",
     "@paystack/inline-js": "^2.22.2",
     "@stripe/react-stripe-js": "^3.6.0",
     "@stripe/stripe-js": "^7.2.0",
@@ -24,12 +25,14 @@
     "next": "15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-draggable": "^4.4.6",
     "react-hot-toast": "^2.5.2",
     "react-icon": "^1.0.0",
     "react-icons": "^5.5.0",
     "react-toastify": "^11.0.5",
     "stripe": "^18.0.0",
     "tailwind-merge": "^3.2.0",
+    "use-sound": "^5.0.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

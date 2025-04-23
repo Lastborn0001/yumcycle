@@ -6,6 +6,7 @@ import HowItWork from "@/components/ui/HowItWork";
 import Mission from "@/components/ui/Mission";
 import PopularRestaurant from "@/components/ui/PopularRestaurant";
 import ProtectedRoute from "@/components/ProtectedRoute";
+// import Chatbot from "@/components/Chatbot";
 export default function Dashboard() {
   return (
     <>
@@ -23,6 +24,7 @@ export default function Dashboard() {
           {/* Mission */}
           <Mission />
         </main>
+        {/* <Chatbot /> */}
         <Footer />
       </ProtectedRoute>
     </>

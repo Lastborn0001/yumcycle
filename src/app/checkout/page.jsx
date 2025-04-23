@@ -163,7 +163,9 @@ const CheckoutPage = () => {
       <ClientLayout>
         <Nav />
         <main className="lg:w-[80%] p-5 w-full m-auto">
-          <div className="py-12 text-center">Loading...</div>
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+          </div>
         </main>
         <Footer />
       </ClientLayout>

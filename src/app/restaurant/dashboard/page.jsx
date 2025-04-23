@@ -10,6 +10,7 @@ import MenuItemForm from "@/components/ui/MenuItemForm";
 import MenuItemList from "@/components/ui/MenuItemList";
 import NotificationList from "@/components/ui/NotificationList";
 import ProfileEditModal from "@/components/ui/ProfileEditModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function RestaurantDashboard() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function RestaurantDashboard() {
   const [error, setError] = useState(null);
   const [restaurant, setRestaurant] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
   useEffect(() => {
     const auth = getAuth(app);
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -324,77 +326,119 @@ export default function RestaurantDashboard() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-orange-50 to-white">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-500"
+        ></motion.div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-red-500">{error}</h2>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+      <div className="text-center py-12 bg-gradient-to-br from-orange-50 to-white min-h-screen flex flex-col justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md"
         >
-          Try Again
-        </button>
-        {error.includes("forbidden") && (
-          <p className="mt-2 text-sm text-gray-500">
-            Your restaurant is not yet approved. Please contact support or wait
-            for admin approval.
-          </p>
-        )}
+          <h2 className="text-xl font-semibold text-red-500 mb-4">{error}</h2>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => window.location.reload()}
+            className="mt-4 px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-md transition-all"
+          >
+            Try Again
+          </motion.button>
+          {error.includes("forbidden") && (
+            <p className="mt-4 text-sm text-gray-500">
+              Your restaurant is not yet approved. Please contact support or
+              wait for admin approval.
+            </p>
+          )}
+        </motion.div>
       </div>
     );
   }
 
   if (!restaurant) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold">Restaurant profile not found</h2>
-        <button
-          onClick={() => router.push("/restaurant/setup")}
-          className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+      <div className="text-center py-12 bg-gradient-to-br from-orange-50 to-white min-h-screen flex flex-col justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md"
         >
-          Setup Your Restaurant
-        </button>
+          <h2 className="text-xl font-semibold mb-4">
+            Restaurant profile not found
+          </h2>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push("/restaurant/setup")}
+            className="mt-4 px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-md transition-all"
+          >
+            Setup Your Restaurant
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
+  const tabVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 },
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-white">
       <Toaster position="top-center" />
-      <header className="bg-white shadow">
+      <header className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-2xl font-bold text-gray-900"
+          >
             {restaurant.name} Dashboard
-          </h1>
+          </motion.h1>
           <div className="flex items-center space-x-4">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsProfileModalOpen(true)}
-              className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-md transition-all"
             >
               Edit Profile
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setActiveTab("notifications")}
               className="relative p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
               <Bell className="h-6 w-6" />
               {notifications.some((n) => !n.read) && (
-                <span className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full"></span>
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-0 right-0 h-3 w-3 bg-red-500 rounded-full"
+                ></motion.span>
               )}
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={handleLogout}
               className="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100"
               title="Log Out"
             >
               <LogOut className="h-6 w-6" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </header>
@@ -407,113 +451,122 @@ export default function RestaurantDashboard() {
       />
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <div className="flex items-center space-x-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white shadow-lg rounded-xl p-6 mb-6"
+        >
+          <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             {restaurant.image ? (
-              <img
+              <motion.img
+                whileHover={{ scale: 1.05 }}
                 src={restaurant.image}
                 alt={restaurant.name}
-                className="w-24 h-24 object-cover rounded-full"
+                className="w-24 h-24 object-cover rounded-full border-4 border-orange-100"
               />
             ) : (
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
+              <div className="w-24 h-24 bg-gradient-to-r from-orange-100 to-orange-200 rounded-full flex items-center justify-center">
                 <span className="text-gray-500">No Image</span>
               </div>
             )}
-            <div>
+            <div className="text-center md:text-left">
               <h2 className="text-xl font-semibold">{restaurant.name}</h2>
               <p className="text-gray-600">
-                Eco-Friendly: {restaurant.isEcoFriendly ? "Yes" : "No"}
+                Eco-Friendly: {restaurant.isEcoFriendly ? "✅ Yes" : "❌ No"}
               </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="relative">
+          <div className="overflow-x-auto pb-2">
+            <div className="flex space-x-4 w-max">
+              {["orders", "menu", "add-item", "notifications"].map((tab) => (
+                <motion.button
+                  key={tab}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setActiveTab(tab)}
+                  className={`whitespace-nowrap py-3 px-4 rounded-lg font-medium text-sm flex items-center ${
+                    activeTab === tab
+                      ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md"
+                      : "bg-white text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {tab === "orders" && <Package className="mr-2 h-4 w-4" />}
+                  {tab === "menu" && <Utensils className="mr-2 h-4 w-4" />}
+                  {tab === "add-item" && <Plus className="mr-2 h-4 w-4" />}
+                  {tab === "notifications" && <Bell className="mr-2 h-4 w-4" />}
+                  {tab
+                    .split("-")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </motion.button>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab("orders")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeTab === "orders"
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <Package className="mr-2 h-4 w-4" /> Orders
-            </button>
-            <button
-              onClick={() => setActiveTab("menu")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeTab === "menu"
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <Utensils className="mr-2 h-4 w-4" /> Menu
-            </button>
-            <button
-              onClick={() => setActiveTab("add-item")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeTab === "add-item"
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add Item
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center ${
-                activeTab === "notifications"
-                  ? "border-orange-500 text-orange-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <Bell className="mr-2 h-4 w-4" /> Notifications
-            </button>
-          </nav>
-        </div>
-
         <div className="mt-6">
-          {activeTab === "orders" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Orders</h2>
-              {orders.length === 0 ? (
-                <div className="text-center py-8">
-                  <Package className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-                  <p>No orders yet</p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {orders.map((order) => (
-                    <OrderCard
-                      key={order._id}
-                      order={order}
-                      onUpdateStatus={handleUpdateOrderStatus}
-                    />
-                  ))}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              variants={tabVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ duration: 0.3 }}
+            >
+              {activeTab === "orders" && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Orders</h2>
+                  {orders.length === 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-center py-8 bg-white rounded-xl shadow-sm"
+                    >
+                      <Package className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
+                      <p>No orders yet</p>
+                    </motion.div>
+                  ) : (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {orders.map((order) => (
+                        <motion.div
+                          key={order._id}
+                          whileHover={{ y: -5 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <OrderCard
+                            order={order}
+                            onUpdateStatus={handleUpdateOrderStatus}
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {activeTab === "menu" && (
-            <MenuItemList items={menuItems} restaurantId={restaurant._id} />
-          )}
+              {activeTab === "menu" && (
+                <MenuItemList items={menuItems} restaurantId={restaurant._id} />
+              )}
 
-          {activeTab === "add-item" && (
-            <MenuItemForm
-              onSubmit={addMenuItem}
-              restaurantId={restaurant._id}
-            />
-          )}
+              {activeTab === "add-item" && (
+                <MenuItemForm
+                  onSubmit={addMenuItem}
+                  restaurantId={restaurant._id}
+                />
+              )}
 
-          {activeTab === "notifications" && (
-            <NotificationList
-              notifications={notifications}
-              onMarkAsRead={markNotificationAsRead}
-            />
-          )}
+              {activeTab === "notifications" && (
+                <NotificationList
+                  notifications={notifications}
+                  onMarkAsRead={markNotificationAsRead}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
     </div>
