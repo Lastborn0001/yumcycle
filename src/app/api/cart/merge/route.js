@@ -22,11 +22,11 @@ async function verifyUserFromToken(req) {
         cart: [],
       });
       await user.save();
-      console.log("Created new user:", user.uid);
+      //   console.log("Created new user:", user.uid);
     } else if (!user.cart) {
       user.cart = [];
       await user.save();
-      console.log("Initialized cart for existing user:", user.uid);
+      //   console.log("Initialized cart for existing user:", user.uid);
     }
 
     return { user, uid: decoded.uid };
@@ -40,7 +40,7 @@ async function verifyUserFromToken(req) {
 }
 
 export async function POST(req) {
-  console.log("Handling POST /api/cart/merge");
+  //   console.log("Handling POST /api/cart/merge");
   try {
     const { user } = await verifyUserFromToken(req);
     const { localCart } = await req.json();
@@ -73,9 +73,9 @@ export async function POST(req) {
     if (modified) {
       user.cart = mergedCart;
       await user.save();
-      console.log("Cart merged for user:", user.uid);
+      //   console.log("Cart merged for user:", user.uid);
     } else {
-      console.log("No changes in cart for user:", user.uid);
+      //   console.log("No changes in cart for user:", user.uid);
     }
 
     return Response.json({ cart: user.cart, modified }, { status: 200 });

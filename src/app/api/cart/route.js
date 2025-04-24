@@ -9,7 +9,7 @@ async function getAuthenticatedUser(req) {
     const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) throw new Error("Authorization token missing");
     const decoded = await admin.auth().verifyIdToken(token);
-    console.log("Authenticated user:", decoded);
+    // console.log("Authenticated user:", decoded);
     return decoded;
   } catch (error) {
     console.error("getAuthenticatedUser error:", error);
@@ -55,7 +55,7 @@ export async function POST(req) {
     }
 
     const result = await cart.save();
-    console.log("Cart save result:", result);
+    // console.log("Cart save result:", result);
 
     return NextResponse.json({ success: true, cart: cart.items });
   } catch (error) {
@@ -73,7 +73,7 @@ export async function GET(req) {
     const decoded = await getAuthenticatedUser(req);
 
     const cart = await Cart.findOne({ userUid: decoded.uid });
-    console.log("Fetched cart:", cart);
+    // console.log("Fetched cart:", cart);
 
     return NextResponse.json({ cart: cart?.items || [] });
   } catch (error) {
@@ -118,7 +118,7 @@ export async function PATCH(req) {
     }
 
     const result = await cart.save();
-    console.log("Cart update result:", result);
+    // console.log("Cart update result:", result);
 
     return NextResponse.json({ success: true, cart: cart.items });
   } catch (error) {
@@ -142,7 +142,7 @@ export async function DELETE(req) {
 
     cart.items = [];
     const result = await cart.save();
-    console.log("Cart clear result:", result);
+    // console.log("Cart clear result:", result);
 
     return NextResponse.json({ success: true });
   } catch (error) {

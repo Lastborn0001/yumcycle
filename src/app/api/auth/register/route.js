@@ -93,17 +93,17 @@ export async function POST(request) {
     let user;
     try {
       user = await User.create(userData);
-      console.log("Created user (Mongoose):", user);
+      // console.log("Created user (Mongoose):", user);
     } catch (mongooseError) {
       console.error("Mongoose create error:", mongooseError);
       // Fallback to raw insert
       user = await User.collection.insertOne(userData);
-      console.log("Created user (raw insert):", user);
+      // console.log("Created user (raw insert):", user);
     }
 
     // Verify raw database state
     const rawUser = await User.collection.findOne({ uid: firebaseUser.uid });
-    console.log("Created user (raw):", rawUser);
+    // console.log("Created user (raw):", rawUser);
 
     return Response.json(
       {

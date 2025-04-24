@@ -25,13 +25,13 @@ export async function POST(req) {
       );
     }
 
-    console.log("Dialogflow config:", {
-      projectId,
-      clientEmail: process.env.DIALOGFLOW_CLIENT_EMAIL,
-      privateKeyExists: !!process.env.DIALOGFLOW_PRIVATE_KEY,
-    });
+    // console.log("Dialogflow config:", {
+    //   projectId,
+    //   clientEmail: process.env.DIALOGFLOW_CLIENT_EMAIL,
+    //   privateKeyExists: !!process.env.DIALOGFLOW_PRIVATE_KEY,
+    // });
 
-    console.log("Processing chatbot query:", { query, sessionId });
+    // console.log("Processing chatbot query:", { query, sessionId });
 
     const sessionPath = sessionClient.projectAgentSessionPath(
       projectId,
@@ -47,13 +47,13 @@ export async function POST(req) {
       },
     };
 
-    console.log("Sending request to Dialogflow:", sessionPath);
+    // console.log("Sending request to Dialogflow:", sessionPath);
     const [response] = await sessionClient.detectIntent(request);
     const result = response.queryResult;
-    console.log("Dialogflow response:", {
-      intent: result.intent?.displayName,
-      fulfillmentText: result.fulfillmentText,
-    });
+    // console.log("Dialogflow response:", {
+    //   intent: result.intent?.displayName,
+    //   fulfillmentText: result.fulfillmentText,
+    // });
 
     // Handle order status intent
     if (
@@ -61,7 +61,7 @@ export async function POST(req) {
       result.parameters.fields.order_id
     ) {
       const orderId = result.parameters.fields.order_id.stringValue;
-      console.log("Querying order:", orderId);
+      //   console.log("Querying order:", orderId);
       const order = await Order.findOne({ _id: orderId }).lean();
       if (order) {
         return NextResponse.json({

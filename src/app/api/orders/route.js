@@ -8,7 +8,7 @@ async function getAuthenticatedUser(req) {
     const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) throw new Error("Authorization token missing");
     const decoded = await admin.auth().verifyIdToken(token);
-    console.log("Authenticated user:", decoded);
+    // console.log("Authenticated user:", decoded);
     return decoded;
   } catch (error) {
     console.error("getAuthenticatedUser error:", error);
@@ -26,7 +26,7 @@ export async function GET(req) {
     const orders = await Order.find({ userUid: user.uid })
       .sort({ createdAt: -1 })
       .lean();
-    console.log(`Fetched ${orders.length} orders for user ${user.uid}`);
+    // console.log(`Fetched ${orders.length} orders for user ${user.uid}`);
 
     return NextResponse.json({ orders });
   } catch (error) {

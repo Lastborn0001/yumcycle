@@ -9,16 +9,16 @@ import {
   Check,
   X,
   Trash2,
-  LogOut, // Add LogOut icon
+  LogOut,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { getAuth, signOut } from "firebase/auth"; // Add signOut
+import { getAuth, signOut } from "firebase/auth";
 import { app } from "@/libs/firebase-client";
 import { toast, Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation"; // Add useRouter
+import { useRouter } from "next/navigation";
 
 const AdminDashboard = () => {
-  const router = useRouter(); // Add router
+  const router = useRouter();
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

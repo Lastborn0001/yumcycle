@@ -12,7 +12,7 @@ export async function GET(req, { params }) {
 
     // Validate ObjectId
     if (!mongoose.isValidObjectId(id)) {
-      console.log("Invalid restaurant ID:", id);
+      // console.log("Invalid restaurant ID:", id);
       return Response.json({ error: "Invalid restaurant ID" }, { status: 400 });
     }
 
@@ -22,11 +22,11 @@ export async function GET(req, { params }) {
     }).lean();
 
     if (!restaurant) {
-      console.log("Restaurant not found or not approved:", id);
+      // console.log("Restaurant not found or not approved:", id);
       return Response.json({ error: "Restaurant not found" }, { status: 404 });
     }
 
-    console.log("Restaurant found:", restaurant._id);
+    // console.log("Restaurant found:", restaurant._id);
     return Response.json(restaurant, { status: 200 });
   } catch (error) {
     console.error("Error fetching restaurant:", {

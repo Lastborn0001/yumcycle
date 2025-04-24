@@ -21,7 +21,7 @@ async function verifyPaystackTransaction(reference, retries = 3) {
 
   for (let i = 0; i < retries; i++) {
     try {
-      console.log(`Verifying Paystack transaction (attempt ${i + 1})`);
+      //   console.log(`Verifying Paystack transaction (attempt ${i + 1})`);
       const response = await fetch(url, options);
 
       if (!response.ok) {
@@ -75,7 +75,7 @@ export async function POST(req) {
     if (reference) {
       // Verify payment with retry mechanism
       const result = await verifyPaystackTransaction(reference);
-      console.log("Paystack verification successful:", result);
+      //   console.log("Paystack verification successful:", result);
 
       // Validate required fields
       if (!phoneNumber || !address) {
@@ -148,7 +148,7 @@ export async function POST(req) {
         status: "pending",
       });
 
-      console.log("Order created:", order);
+      //   console.log("Order created:", order);
 
       // Create notifications
       const orderIdString = order._id.toString();
