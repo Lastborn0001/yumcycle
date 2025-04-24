@@ -9,7 +9,7 @@ async function getAuthenticatedUser(req) {
     const token = req.headers.get("authorization")?.split(" ")[1];
     if (!token) throw new Error("Authorization token missing");
     const decoded = await admin.auth().verifyIdToken(token);
-    console.log("Authenticated user:", decoded);
+    // console.log("Authenticated user:", decoded);
     return decoded;
   } catch (error) {
     console.error("getAuthenticatedUser error:", error);
@@ -43,9 +43,9 @@ export async function GET(req) {
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log(
-      `Fetched ${notifications.length} notifications for restaurant ${restaurant._id}`
-    );
+    // console.log(
+    //   `Fetched ${notifications.length} notifications for restaurant ${restaurant._id}`
+    // );
 
     return NextResponse.json(notifications);
   } catch (error) {
@@ -96,9 +96,9 @@ export async function PUT(req) {
     notification.read = true;
     await notification.save();
 
-    console.log(
-      `Notification ${id} marked as read for restaurant ${restaurant._id}`
-    );
+    // console.log(
+    //   `Notification ${id} marked as read for restaurant ${restaurant._id}`
+    // );
 
     return NextResponse.json(notification);
   } catch (error) {

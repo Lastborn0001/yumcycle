@@ -27,22 +27,22 @@ export default function RestaurantDashboard() {
     const auth = getAuth(app);
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        console.log("No user, redirecting to login");
+        // console.log("No user, redirecting to login");
         router.push("/login");
         return;
       }
-      console.log("Authenticated user UID:", user.uid);
+      // console.log("Authenticated user UID:", user.uid);
       try {
         setLoading(true);
         const token = await user.getIdToken(true);
-        console.log("Fetching profile with token:", token.slice(0, 20) + "...");
+        // console.log("Fetching profile with token:", token.slice(0, 20) + "...");
         const profileRes = await fetch("/api/restaurants/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Profile response:", {
-          status: profileRes.status,
-          statusText: profileRes.statusText,
-        });
+        // console.log("Profile response:", {
+        //   status: profileRes.status,
+        //   statusText: profileRes.statusText,
+        // });
         if (!profileRes.ok) {
           const errorData = await profileRes.json();
           console.error("Profile fetch error:", errorData);
@@ -84,7 +84,7 @@ export default function RestaurantDashboard() {
       setError(null);
 
       const token = await user.getIdToken();
-      console.log("Fetching data for user:", user.uid);
+      // console.log("Fetching data for user:", user.uid);
 
       const [profileRes, ordersRes, menuRes, notificationsRes] =
         await Promise.all([
@@ -136,12 +136,12 @@ export default function RestaurantDashboard() {
         Array.isArray(notificationsData) ? notificationsData : []
       );
 
-      console.log("Fetched data:", {
-        profileData,
-        ordersData,
-        menuData,
-        notificationsData,
-      });
+      // console.log("Fetched data:", {
+      //   profileData,
+      //   ordersData,
+      //   menuData,
+      //   notificationsData,
+      // });
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err.message);

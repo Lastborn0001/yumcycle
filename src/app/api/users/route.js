@@ -3,7 +3,7 @@ import User from "@/models/User";
 import admin from "@/libs/firebaseAdmin";
 
 async function verifyUser(token) {
-  console.log("Verifying token:", token?.slice(0, 20) + "...");
+  // console.log("Verifying token:", token?.slice(0, 20) + "...");
   try {
     const decoded = await admin.auth().verifyIdToken(token);
     return { uid: decoded.uid, email: decoded.email };
@@ -17,11 +17,11 @@ async function verifyUser(token) {
 }
 
 export async function POST(req) {
-  console.log("Handling POST /api/users");
+  // console.log("Handling POST /api/users");
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token) {
-      console.log("No token provided");
+      // console.log("No token provided");
       return Response.json(
         { error: "Authorization token missing" },
         { status: 401 }
@@ -32,16 +32,16 @@ export async function POST(req) {
     const { uid, email } = await verifyUser(token);
 
     const firebaseUser = await admin.auth().getUser(uid);
-    console.log("Firebase user:", {
-      uid,
-      email,
-      name: firebaseUser.displayName,
-      photoURL: firebaseUser.photoURL || "No photoURL provided",
-    });
+    // console.log("Firebase user:", {
+    //   uid,
+    //   email,
+    //   name: firebaseUser.displayName,
+    //   photoURL: firebaseUser.photoURL || "No photoURL provided",
+    // });
 
     let user = await User.findOne({ uid });
     if (!user) {
-      console.log("Creating new user in MongoDB");
+      // console.log("Creating new user in MongoDB");
       user = await User.create({
         uid,
         email: email || firebaseUser.email,
@@ -50,7 +50,7 @@ export async function POST(req) {
         role: "user",
       });
     } else {
-      console.log("Updating existing user in MongoDB");
+      // console.log("Updating existing user in MongoDB");
       user = await User.findOneAndUpdate(
         { uid },
         {
@@ -64,7 +64,7 @@ export async function POST(req) {
       );
     }
 
-    console.log("User processed:", user._id);
+    // console.log("User processed:", user._id);
     return Response.json(user, { status: 201 });
   } catch (error) {
     console.error("Error processing user:", {

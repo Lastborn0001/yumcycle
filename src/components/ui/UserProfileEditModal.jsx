@@ -47,11 +47,11 @@ const UserProfileEditModal = ({ isOpen, onClose, user, onProfileUpdate }) => {
     setFormData((prev) => ({ ...prev, image: file }));
     setPreview(URL.createObjectURL(file));
     setRemoveImage(false);
-    console.log("Selected image:", {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    });
+    // console.log("Selected image:", {
+    //   name: file.name,
+    //   size: file.size,
+    //   type: file.type,
+    // });
   };
 
   const handleRemoveImage = () => {
@@ -79,18 +79,18 @@ const UserProfileEditModal = ({ isOpen, onClose, user, onProfileUpdate }) => {
       if (formData.image) data.append("image", formData.image);
       if (removeImage) data.append("removeImage", "true");
 
-      for (let [key, value] of data.entries()) {
-        console.log(`FormData: ${key}=${value.name || value}`);
-      }
+      // for (let [key, value] of data.entries()) {
+      //   console.log(`FormData: ${key}=${value.name || value}`);
+      // }
 
       // Update Firebase Authentication
       if (formData.name !== (currentUser.displayName || "")) {
         await updateProfile(currentUser, { displayName: formData.name });
-        console.log("Firebase displayName updated");
+        // console.log("Firebase displayName updated");
       }
       if (formData.email !== currentUser.email) {
         await updateEmail(currentUser, formData.email);
-        console.log("Firebase email updated");
+        // console.log("Firebase email updated");
       }
 
       // Update MongoDB and Cloudinary

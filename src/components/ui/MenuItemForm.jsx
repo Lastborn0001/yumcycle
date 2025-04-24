@@ -24,11 +24,11 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
         toast.error("Image size must be less than 5MB");
         return;
       }
-      console.log("Selected image:", {
-        name: files[0].name,
-        size: files[0].size,
-        type: files[0].type,
-      });
+      // console.log("Selected image:", {
+      //   name: files[0].name,
+      //   size: files[0].size,
+      //   type: files[0].type,
+      // });
     }
     setFormData((prev) => ({
       ...prev,
@@ -51,9 +51,9 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
       if (formData.image) {
         data.append("image", formData.image);
       }
-      for (let [key, value] of data.entries()) {
-        console.log(`FormData: ${key}=${value.name || value}`);
-      }
+      // for (let [key, value] of data.entries()) {
+      //   // console.log(`FormData: ${key}=${value.name || value}`);
+      // }
 
       await onSubmit(data);
       toast.success("Menu item added successfully!");

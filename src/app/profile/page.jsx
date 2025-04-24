@@ -54,12 +54,12 @@ const page = () => {
           photoURL: userData.photoURL || currentUser.photoURL,
         };
         setUser(mergedUser);
-        console.log("User data:", {
-          name: mergedUser.name,
-          email: mergedUser.email,
-          firebasePhotoURL: currentUser.photoURL,
-          mongoPhotoURL: userData.photoURL,
-        });
+        // console.log("User data:", {
+        //   name: mergedUser.name,
+        //   email: mergedUser.email,
+        //   firebasePhotoURL: currentUser.photoURL,
+        //   mongoPhotoURL: userData.photoURL,
+        // });
       } catch (err) {
         toast.error(err.message);
         console.error("Fetch profile error:", err);
@@ -101,7 +101,7 @@ const page = () => {
   }
 
   if (!user) {
-    return null; // Redirect handled by useEffect
+    return null;
   }
 
   return (

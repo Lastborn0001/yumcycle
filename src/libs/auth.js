@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/libs/db/mongo";
 import User from "@/models/User";
 
 export async function verifyUser(token) {
-  console.log("Verifying token for user:", token?.slice(0, 20) + "...");
+  //   console.log("Verifying token for user:", token?.slice(0, 20) + "...");
   try {
     await connectToDatabase();
     const decoded = await admin.auth().verifyIdToken(token);

@@ -37,11 +37,11 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
 
     setFormData((prev) => ({ ...prev, image: file }));
     setPreview(URL.createObjectURL(file));
-    console.log("Selected image:", {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    });
+    // console.log("Selected image:", {
+    //   name: file.name,
+    //   size: file.size,
+    //   type: file.type,
+    // });
   };
 
   const handleEcoFriendlyChange = (e) => {
@@ -67,9 +67,9 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
       }
       data.append("isEcoFriendly", formData.isEcoFriendly);
 
-      for (let [key, value] of data.entries()) {
-        console.log(`FormData: ${key}=${value.name || value}`);
-      }
+      // for (let [key, value] of data.entries()) {
+      //   console.log(`FormData: ${key}=${value.name || value}`);
+      // }
 
       const response = await fetch("/api/restaurants/profile", {
         method: "PATCH",

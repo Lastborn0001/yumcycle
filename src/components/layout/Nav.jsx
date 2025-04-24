@@ -36,12 +36,12 @@ const Nav = memo(() => {
   const fetchFailed = useRef(false);
   const isMounted = useRef(true);
 
-  console.log("Nav: Rendered", {
-    user: !!user,
-    loading,
-    cartItemCount,
-    cartStatus,
-  });
+  // console.log("Nav: Rendered", {
+  //   user: !!user,
+  //   loading,
+  //   cartItemCount,
+  //   cartStatus,
+  // });
 
   useEffect(() => {
     isMounted.current = true;
@@ -52,11 +52,11 @@ const Nav = memo(() => {
 
   useEffect(() => {
     if (loading || !user || cartStatus === "loading") {
-      console.log("Nav: Skipping syncCart", {
-        loading,
-        user: !!user,
-        cartStatus,
-      });
+      // console.log("Nav: Skipping syncCart", {
+      //   loading,
+      //   user: !!user,
+      //   cartStatus,
+      // });
       return;
     }
 
@@ -66,14 +66,14 @@ const Nav = memo(() => {
 
         // Only sync if we have local items and haven't synced yet
         if (currentItems.length > 0 && !hasSyncedCart.current) {
-          console.log("Nav: Merging cart with", currentItems.length, "items");
+          // console.log("Nav: Merging cart with", currentItems.length, "items");
           hasSyncedCart.current = true;
           await mergeCart(currentItems);
         }
 
         // Only fetch if we haven't fetched yet
         if (!hasFetchedCart.current) {
-          console.log("Nav: Fetching cart");
+          // console.log("Nav: Fetching cart");
           hasFetchedCart.current = true;
           await fetchCart();
         }

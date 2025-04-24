@@ -12,7 +12,7 @@ import { CreditCard } from "lucide-react";
 
 const CheckoutPage = () => {
   const router = useRouter();
-  const { firebaseUser, loading } = useAuth(); // Use firebaseUser for consistency
+  const { firebaseUser, loading } = useAuth();
   const hasRedirected = useRef(false);
   const { items, status, initializeCart, clearCart } = useCartStore();
   const [email, setEmail] = useState(firebaseUser?.email || "");
@@ -27,7 +27,7 @@ const CheckoutPage = () => {
     script.src = "https://js.paystack.co/v1/inline.js";
     script.async = true;
     script.onload = () => {
-      console.log("Paystack script loaded");
+      // console.log("Paystack script loaded");
       setPaystackLoaded(true);
     };
     script.onerror = () => {
@@ -43,11 +43,11 @@ const CheckoutPage = () => {
 
   // Initialize cart and debug
   useEffect(() => {
-    console.log("CheckoutPage: Auth state:", { firebaseUser, loading, status });
+    // console.log("CheckoutPage: Auth state:", { firebaseUser, loading, status });
     if (loading || hasRedirected.current) return;
 
     if (!firebaseUser && !status.includes("loading")) {
-      console.log("No user, redirecting to /login");
+      // console.log("No user, redirecting to /login");
       hasRedirected.current = true;
       toast.error("Please log in to checkout");
       router.push("/login");
@@ -55,14 +55,14 @@ const CheckoutPage = () => {
     }
 
     if (firebaseUser && status === "idle") {
-      console.log("Initializing cart for user:", firebaseUser.uid);
+      // console.log("Initializing cart for user:", firebaseUser.uid);
       initializeCart();
     }
   }, [firebaseUser, loading, status, initializeCart, router]);
 
   // Log cart items whenever they change
   useEffect(() => {
-    console.log("CheckoutPage: Cart items:", items);
+    // console.log("CheckoutPage: Cart items:", items);
   }, [items]);
 
   const subtotal = items.reduce(
@@ -98,7 +98,7 @@ const CheckoutPage = () => {
       await clearCart();
       toast.dismiss();
       toast.success("Payment successful! Order placed.");
-      console.log(phoneNumber, address);
+      // console.log(phoneNumber, address);
       router.push("/orders");
     } catch (error) {
       console.error("Verify payment error:", error);
@@ -139,18 +139,18 @@ const CheckoutPage = () => {
         amount: total * 100, // Convert to kobo
         currency: "NGN",
         callback: (response) => {
-          console.log("Paystack callback response:", response);
+          // console.log("Paystack callback response:", response);
           toast.loading("Verifying payment...");
           verifyPayment(response.reference);
         },
         onClose: () => {
-          console.log("Paystack payment closed");
+          // console.log("Paystack payment closed");
           toast.error("Payment cancelled");
         },
         channels: ["card", "bank_transfer", "ussd", "mobile_money"],
       });
 
-      console.log("Opening Paystack payment iframe");
+      // console.log("Opening Paystack payment iframe");
       handler.openIframe();
     } catch (error) {
       console.error("Paystack setup error:", error);

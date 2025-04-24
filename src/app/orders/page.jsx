@@ -17,13 +17,13 @@ const OrderHistoryPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("OrderHistoryPage auth state:", { firebaseUser, loading });
+    // console.log("OrderHistoryPage auth state:", { firebaseUser, loading });
     if (loading || hasRedirected.current) return;
 
     // Debounce redirect to ensure auth state is stable
     const redirectTimeout = setTimeout(() => {
       if (!loading && firebaseUser === null) {
-        console.log("No user detected, redirecting to /login");
+        // console.log("No user detected, redirecting to /login");
         hasRedirected.current = true;
         toast.error("Please log in to view your orders");
         router.push("/login");
@@ -39,10 +39,10 @@ const OrderHistoryPage = () => {
     const fetchOrders = async () => {
       try {
         setIsLoading(true);
-        console.log("Fetching orders for user:", {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-        });
+        // console.log("Fetching orders for user:", {
+        //   uid: firebaseUser.uid,
+        //   email: firebaseUser.email,
+        // });
         const token = await firebaseUser.getIdToken();
         const response = await fetch("/api/orders", {
           headers: {
@@ -56,7 +56,7 @@ const OrderHistoryPage = () => {
         }
 
         const data = await response.json();
-        console.log("Fetched orders:", data.orders);
+        // console.log("Fetched orders:", data.orders);
         setOrders(data.orders || []);
       } catch (err) {
         console.error("Fetch orders error:", err);

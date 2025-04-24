@@ -13,22 +13,22 @@ export function AuthProvider({ children }) {
   const authStateChanged = useRef(false);
 
   useEffect(() => {
-    console.log("AuthContext: Initializing onAuthStateChanged");
+    // console.log("AuthContext: Initializing onAuthStateChanged");
     const unsubscribe = onAuthStateChanged(
       auth,
       async (firebaseUser) => {
         if (authStateChanged.current) {
-          console.log("AuthContext: Skipping duplicate auth state change");
+          //   console.log("AuthContext: Skipping duplicate auth state change");
           return;
         }
         authStateChanged.current = true;
 
         try {
-          console.log("Auth state changed:", {
-            uid: firebaseUser?.uid,
-            email: firebaseUser?.email,
-            hasGetIdToken: typeof firebaseUser?.getIdToken === "function",
-          });
+          //   console.log("Auth state changed:", {
+          //     uid: firebaseUser?.uid,
+          //     email: firebaseUser?.email,
+          //     hasGetIdToken: typeof firebaseUser?.getIdToken === "function",
+          //   });
           if (firebaseUser) {
             const token = await firebaseUser.getIdToken();
             const response = await fetch("/api/users/profile", {
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
               photoURL: userData.photoURL || firebaseUser.photoURL,
             });
           } else {
-            console.log("No Firebase user, setting null");
+            // console.log("No Firebase user, setting null");
             setFirebaseUser(null);
             setUser(null);
           }
@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
           setFirebaseUser(firebaseUser); // Fallback to Firebase user
           setUser(firebaseUser); // Fallback to basic user info
         } finally {
-          console.log("AuthContext: Setting loading to false");
+          //   console.log("AuthContext: Setting loading to false");
           setLoading(false);
           authStateChanged.current = false;
         }
@@ -67,7 +67,7 @@ export function AuthProvider({ children }) {
     );
 
     return () => {
-      console.log("AuthContext: Cleaning up onAuthStateChanged");
+      //   console.log("AuthContext: Cleaning up onAuthStateChanged");
       unsubscribe();
     };
   }, [auth]);

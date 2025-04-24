@@ -43,7 +43,7 @@ export default function AuthForms() {
         try {
           const tokenResult = await user.getIdTokenResult();
           const role = tokenResult.claims.role;
-          console.log("User role:", role); // Debug log
+          // console.log("User role:", role);
 
           if (role === "admin") {
             router.push("/admin/dashboard");
@@ -183,7 +183,7 @@ export default function AuthForms() {
                   <label className="block text-sm font-medium text-gray-700">
                     Account Type
                   </label>
-                  <div className="mt-1 grid grid-cols-3 gap-3">
+                  <div className="mt-1 grid grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setRole("user")}
@@ -206,7 +206,7 @@ export default function AuthForms() {
                     >
                       <FiBriefcase className="mr-2" /> Restaurant
                     </button>
-                    <button
+                    {/* <button
                       type="button"
                       onClick={() => setRole("admin")}
                       className={`py-2 px-3 border rounded-md text-sm font-medium flex items-center justify-center ${
@@ -218,7 +218,7 @@ export default function AuthForms() {
                       title="Admin accounts can only be created by existing admins"
                     >
                       <FiHome className="mr-2" /> Admin
-                    </button>
+                    </button> */}
                   </div>
                 </div>
 

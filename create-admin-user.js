@@ -1,5 +1,5 @@
 require("dotenv").config({ path: ".env.local" });
-console.log("MONGO_URI:", process.env.MONGO_URI);
+// console.log("MONGO_URI:", process.env.MONGO_URI);
 
 const admin = require("./src/libs/firebaseAdmin");
 const { connectToDatabase } = require("./src/libs/db/mongo");
@@ -15,7 +15,7 @@ async function createAdminUser() {
       password: "yumcycle@2025",
       displayName: "Admin",
     });
-    console.log("Firebase user created:", firebaseUser.uid);
+    // console.log("Firebase user created:", firebaseUser.uid);
 
     // Save user in MongoDB
     const userData = {
@@ -30,7 +30,7 @@ async function createAdminUser() {
       upsert: true,
       setDefaultsOnInsert: true,
     });
-    console.log("MongoDB user created:", user);
+    // console.log("MongoDB user created:", user);
 
     process.exit(0);
   } catch (error) {
