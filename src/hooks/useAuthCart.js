@@ -1,4 +1,4 @@
-import useCartStore from "@/store/cartStore";
+import { useCartStore } from "@/store/cartStore";
 import { useAuth } from "@/libs/AuthContext";
 
 export default function useAuthCart() {

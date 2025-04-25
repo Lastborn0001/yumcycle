@@ -163,4 +163,10 @@ export const useCartStore = create((set, get) => ({
       set({ error: error.message, status: "failed" });
     }
   },
+  resetFetchAttempts: () => {
+    set({
+      status: "idle",
+      error: null,
+    });
+  },
 }));
