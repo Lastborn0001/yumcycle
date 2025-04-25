@@ -6,6 +6,7 @@ import Help from "@/components/ui/Help";
 import Stats from "@/components/ui/Stats";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import React from "react";
+import Chatbot from "@/components/Chatbot";
 
 const page = () => {
   return (
@@ -21,6 +22,7 @@ const page = () => {
           {/* help */}
           <Help />
         </main>
+        <Chatbot />
         <Footer />
       </ProtectedRoute>
     </>

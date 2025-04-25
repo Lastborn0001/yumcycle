@@ -11,6 +11,8 @@ import { useAuth } from "@/libs/AuthContext";
 import { useCartStore } from "@/store/cartStore";
 import useAuthCart from "@/hooks/useAuthCart";
 import { auth } from "@/libs/firebaseClient";
+import Chatbot from "@/components/Chatbot";
+import Loading from "@/components/ui/Loading";
 
 const RestaurantPage = () => {
   const params = useParams();
@@ -132,12 +134,7 @@ const RestaurantPage = () => {
       toast.error(error.message || "Failed to update cart");
     }
   };
-  if (loading || cartStatus === "loading")
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
-    );
+  if (loading || cartStatus === "loading") return <Loading />;
   if (error)
     return <div className="text-center py-8 text-red-500">{error}</div>;
   if (!restaurant)
@@ -281,6 +278,7 @@ const RestaurantPage = () => {
           </div>
         </section>
       )}
+      <Chatbot />
       <Footer />
     </ClientLayout>
   );

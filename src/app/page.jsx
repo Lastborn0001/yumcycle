@@ -1,4 +1,5 @@
 "use client";
+import Chatbot from "@/components/Chatbot";
 import Footer from "@/components/layout/Footer";
 import Nav from "@/components/layout/Nav";
 import FoodWaste from "@/components/ui/FoodWaste";
@@ -20,6 +21,7 @@ export default function Home() {
         <Help />
       </main>
       <Footer />
+      <Chatbot />
     </>
   );
 }

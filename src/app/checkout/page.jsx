@@ -9,6 +9,7 @@ import ClientLayout from "@/app/ClientLayout";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import { CreditCard } from "lucide-react";
+import Loading from "@/components/ui/Loading";
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -163,9 +164,7 @@ const CheckoutPage = () => {
       <ClientLayout>
         <Nav />
         <main className="lg:w-[80%] p-5 w-full m-auto">
-          <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-          </div>
+          <Loading />
         </main>
         <Footer />
       </ClientLayout>

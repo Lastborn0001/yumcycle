@@ -18,6 +18,7 @@ import ClientLayout from "@/app/ClientLayout";
 import { toast, Toaster } from "react-hot-toast";
 import { useAuth } from "@/libs/AuthContext";
 import { useCartStore } from "@/store/cartStore";
+import Loading from "@/components/ui/Loading";
 
 const CartPage = () => {
   const router = useRouter();
@@ -117,11 +118,7 @@ const CartPage = () => {
   };
 
   if (cartStatus === "loading") {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

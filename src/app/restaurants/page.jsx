@@ -4,6 +4,7 @@ import ResHero from "@/components/ui/ResHero";
 import SearchRes from "@/components/ui/SearchRes";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import React from "react";
+import Chatbot from "@/components/Chatbot";
 
 const page = () => {
   return (
@@ -16,6 +17,7 @@ const page = () => {
           {/* Search and Filter Section */}
           <SearchRes />
         </main>
+        <Chatbot />
         <Footer />
       </ProtectedRoute>
     </>

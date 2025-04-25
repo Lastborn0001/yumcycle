@@ -2,7 +2,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./ClientLayout";
 import CartInitializer from "@/components/CartInitializer";
-import Chatbot from "@/components/Chatbot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +27,6 @@ export default function RootLayout({ children }) {
         {" "}
         <CartInitializer />
         <ClientLayout>{children}</ClientLayout>
-        <Chatbot />
       </body>
       <script src="https://js.paystack.co/v1/inline.js" async></script>
     </html>

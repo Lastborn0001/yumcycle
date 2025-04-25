@@ -11,6 +11,7 @@ import MenuItemList from "@/components/ui/MenuItemList";
 import NotificationList from "@/components/ui/NotificationList";
 import ProfileEditModal from "@/components/ui/ProfileEditModal";
 import { motion, AnimatePresence } from "framer-motion";
+import Loading from "@/components/ui/Loading";
 
 export default function RestaurantDashboard() {
   const router = useRouter();
@@ -325,15 +326,7 @@ export default function RestaurantDashboard() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-orange-50 to-white">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="rounded-full h-16 w-16 border-t-4 border-b-4 border-orange-500"
-        ></motion.div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {

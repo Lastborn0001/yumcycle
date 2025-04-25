@@ -7,6 +7,8 @@ import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import { Toaster, toast } from "react-hot-toast";
 import { Package, Clock, CheckCircle, XCircle } from "lucide-react";
+import Chatbot from "@/components/Chatbot";
+import Loading from "@/components/ui/Loading";
 
 const OrderHistoryPage = () => {
   const router = useRouter();
@@ -89,9 +91,7 @@ const OrderHistoryPage = () => {
       <ClientLayout>
         <Nav />
         <main className="lg:w-[80%] p-5 w-full m-auto">
-          <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-          </div>
+          <Loading />
         </main>
         <Footer />
       </ClientLayout>
@@ -186,6 +186,7 @@ const OrderHistoryPage = () => {
           </div>
         </section>
       </main>
+      <Chatbot />
       <Footer />
     </ClientLayout>
   );

@@ -3,6 +3,7 @@ import { Clock, Map, Search, Truck, Leaf } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Button from "./Button";
+import Loading from "./Loading";
 
 const SearchRes = () => {
   const router = useRouter();
@@ -56,12 +57,7 @@ const SearchRes = () => {
 
   const cuisines = [...new Set(restaurants.flatMap((r) => r.cuisine))];
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
-    );
+  if (loading) return <Loading />;
   if (error)
     return <div className="text-center py-8 text-red-500">{error}</div>;
 

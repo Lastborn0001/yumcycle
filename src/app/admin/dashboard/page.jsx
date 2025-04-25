@@ -16,6 +16,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { app } from "@/libs/firebase-client";
 import { toast, Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Loading from "@/components/ui/Loading";
 
 const AdminDashboard = () => {
   const router = useRouter();
@@ -215,7 +216,7 @@ const AdminDashboard = () => {
     }
   }, [error]);
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (loading) return <Loading />;
   if (error)
     return (
       <div className="text-center py-8 text-red-500">
