@@ -100,7 +100,7 @@ export default function Chatbot() {
             exit={{ opacity: 0, scale: 0.8 }}
             className="w-[90vw] max-w-md h-[75vh] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden"
           >
-            <div className="flex justify-between items-center p-4 bg-orange-500 text-white">
+            <div className="flex justify-between items-center p-4 cursor-grab bg-orange-500 text-white">
               <h3 className="font-semibold">Yumcycle Assistant</h3>
               <button
                 onClick={() => setIsOpen(false)}
