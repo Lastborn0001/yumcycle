@@ -11,7 +11,7 @@ const page = () => {
     <>
       <ProtectedRoute>
         <Nav />
-        <main>
+        <main className="h-dvh">
           {/* Hero */}
           <ResHero />
           {/* Search and Filter Section */}

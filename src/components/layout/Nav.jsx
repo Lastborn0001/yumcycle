@@ -146,25 +146,25 @@ const Nav = memo(() => {
         <ul className="hidden lg:flex justify-around pt-2">
           <li
             onClick={() => handleNavigation("/dashboard")}
-            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+            className="m-[0_15px] font-semibold xl:text-[14px] text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             Home
           </li>
           <li
             onClick={() => handleNavigation("/restaurants")}
-            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+            className="m-[0_15px] font-semibold xl:text-[14px] text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             Restaurants
           </li>
           <li
             onClick={() => handleNavigation("/foodWaste")}
-            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+            className="m-[0_15px] font-semibold xl:text-[14px] text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             Food Waste
           </li>
           <li
             onClick={() => handleNavigation("/orders")}
-            className="m-[0_15px] font-semibold text-[12px] cursor-pointer transition hover:text-orange-500"
+            className="m-[0_15px] font-semibold xl:text-[14px] text-[12px] cursor-pointer transition hover:text-orange-500"
           >
             My Orders
           </li>

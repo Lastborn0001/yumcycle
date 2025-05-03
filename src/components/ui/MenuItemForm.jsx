@@ -92,7 +92,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
             value={formData.name}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+            className="mt-1 block w-full p-2 text-xl rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 ring-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-orange-500 "
           />
         </div>
         <div>
@@ -103,7 +103,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+            className="mt-1 block w-full p-2 text-xl rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 ring-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-orange-500"
           />
         </div>
         <div>
@@ -118,7 +118,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
             required
             min="0"
             step="0.01"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+            className="mt-1 block w-full p-2 text-xl rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 ring-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-orange-500"
           />
         </div>
         <div>
@@ -130,7 +130,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
             value={formData.category}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+            className="mt-1 block w-full p-2 text-xl rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 ring-orange-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 text-orange-500"
           >
             <option value="Main">Main</option>
             <option value="Side">Side</option>
@@ -176,7 +176,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full py-2 px-4 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:bg-orange-300"
+          className="w-full py-2 px-4 bg-orange-500 cursor-pointer text-white rounded-md hover:bg-orange-600 disabled:bg-orange-300"
         >
           {submitting ? "Submitting..." : "Add Menu Item"}
         </button>

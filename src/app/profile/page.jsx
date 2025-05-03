@@ -107,10 +107,11 @@ const page = () => {
       <header>
         <Nav />
       </header>
-      <main className="max-w-4xl mx-auto p-8">
+      <main className="max-w-4xl h-dvh mx-auto p-8">
         <div className="flex justify-between items-center my-20 mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
-            {user.name} Profile
+            Hi,
+            {user.name} 👋
           </h1>
           <button
             onClick={handleLogout}

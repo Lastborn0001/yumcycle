@@ -1,4 +1,5 @@
 import React from "react";
+import toast from "react-hot-toast";
 
 const MenuItemList = ({ items, restaurantId }) => {
   if (!items || items.length === 0) {
@@ -50,8 +51,8 @@ const MenuItemList = ({ items, restaurantId }) => {
         </div>
       ))}
       <button
-        onClick={() => handleDelete(item._id)}
-        className="mt-2 px-4 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200"
+        onClick={() => handleDelete(items._id)}
+        className="mt-2 px-4 py-1 bg-red-100 text-red-800 cursor-pointer rounded hover:bg-red-200"
       >
         Delete
       </button>

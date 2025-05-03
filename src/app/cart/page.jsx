@@ -124,7 +124,7 @@ const CartPage = () => {
   return (
     <ClientLayout>
       <Nav />
-      <main className="lg:w-[80%] p-5 w-full m-auto">
+      <main className="lg:w-[80%] h-dvh p-5 w-full m-auto">
         <Toaster position="top-center" />
         <section>
           <div className="py-24 md:py-24">
@@ -246,7 +246,7 @@ const CartPage = () => {
                           Fight Food Waste
                         </h3>
                         <p className="mt-1 text-sm">
-                          Add $1.00 to your order to donate a meal to someone in
+                          Add ₦100 to your order to donate a meal to someone in
                           need. We partner with local food banks to distribute
                           meals to those facing food insecurity.
                         </p>
@@ -256,7 +256,7 @@ const CartPage = () => {
                             htmlFor="donate-meal"
                             className="text-sm font-medium leading-none"
                           >
-                            Yes, I'd like to donate a meal (+$1.00)
+                            Yes, I'd like to donate a meal (+₦100)
                           </label>
                         </div>
                       </div>

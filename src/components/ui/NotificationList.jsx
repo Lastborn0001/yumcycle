@@ -42,7 +42,7 @@ const NotificationList = ({ notifications, onMarkAsRead }) => {
                 {!notification.read && (
                   <button
                     onClick={() => onMarkAsRead(notification._id)}
-                    className="mt-2 text-sm text-orange-500 hover:underline"
+                    className="mt-2 text-sm text-orange-500 hover:underline cursor-pointer"
                   >
                     Mark as Read
                   </button>

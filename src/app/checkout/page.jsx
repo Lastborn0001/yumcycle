@@ -174,7 +174,7 @@ const CheckoutPage = () => {
   return (
     <ClientLayout>
       <Nav />
-      <main className="lg:w-[80%] p-5 w-full m-auto">
+      <main className="lg:w-[80%] h-dvh p-5 w-full m-auto">
         <Toaster position="top-center" />
         <section>
           <div className="py-12 md:py-24">

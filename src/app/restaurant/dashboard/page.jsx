@@ -404,7 +404,7 @@ export default function RestaurantDashboard() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setIsProfileModalOpen(true)}
-              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-md transition-all"
+              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 cursor-pointer  text-white rounded-lg hover:shadow-md transition-all"
             >
               Edit Profile
             </motion.button>
@@ -412,7 +412,7 @@ export default function RestaurantDashboard() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setActiveTab("notifications")}
-              className="relative p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="relative p-2 rounded-full cursor-pointer  text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
               <Bell className="h-6 w-6" />
               {notifications.some((n) => !n.read) && (
@@ -427,7 +427,7 @@ export default function RestaurantDashboard() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleLogout}
-              className="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-2 rounded-full text-gray-400 cursor-pointer  hover:text-gray-500 hover:bg-gray-100"
               title="Log Out"
             >
               <LogOut className="h-6 w-6" />
@@ -480,7 +480,7 @@ export default function RestaurantDashboard() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setActiveTab(tab)}
-                  className={`whitespace-nowrap py-3 px-4 rounded-lg font-medium text-sm flex items-center ${
+                  className={`whitespace-nowrap py-3 px-4 rounded-lg cursor-pointer font-medium text-sm flex items-center ${
                     activeTab === tab
                       ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md"
                       : "bg-white text-gray-500 hover:text-gray-700 hover:bg-gray-100"
