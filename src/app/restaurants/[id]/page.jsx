@@ -143,7 +143,7 @@ const RestaurantPage = () => {
   return (
     <ClientLayout>
       <Nav />
-      <main className="h-dvh">
+      <main className="">
         <section className="mb-8 xl:w-[80%] p-9 w-full m-auto relative py-12 md:py-24">
           <Toaster position="top-center" />
           <div className="relative">
