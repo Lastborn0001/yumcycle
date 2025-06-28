@@ -16,7 +16,7 @@ const page = () => {
         <main className="lg:w-[80%] w-full m-auto ">
           <FoodWaste />
           {/* Stats Section */}
-          <Stats />
+          {/* <Stats /> */}
           {/* why food waste matter */}
           <FoodWasteMatter />
           {/* help */}

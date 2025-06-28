@@ -13,7 +13,7 @@ const Mission = () => {
           </h2>
           <p className="mt-4 text-lg opacity-90">
             Together, we can make a difference. Start ordering from restaurants
-            that care about sustainability.
+            and discover great surplus deals.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Button
@@ -30,7 +30,7 @@ const Mission = () => {
                 router.push("/foodWaste");
               }}
               className="bg-transparent cursor-pointer border h-11 rounded-md px-8 border-input text-white bg-background transition hover:bg-white hover:text-orange-400"
-              name={"Learn About Our Initiatives"}
+              name={"Browse Surplus Food"}
             />
           </div>
         </div>

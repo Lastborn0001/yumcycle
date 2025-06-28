@@ -1,17 +1,12 @@
+import { Locate, LocateIcon, Map, MapPin } from "lucide-react";
 import React from "react";
 
 const FoodWasteMatter = () => {
   return (
     <>
-      <section className="text-center p-[40px] lg:p-[10px_100px]">
-        <h2 className="text-[20px] font-bold p-1 ">Why Food Waste Matters</h2>
-        <p className="text-[15px] text-gray-500">
-          Approximately one-third of all food produced globally is wasted. This
-          not only means that valuable resources used in production are wasted,
-          but food waste is also a significant contributor to greenhouse gas
-          emissions. By participating in our initiatives, you're helping to
-          create a more sustainable food system.
-        </p>
+      <section className=" p-[40px] lg:p-[10px_10px]">
+        <h2 className="text-[20px] font-bold p-1 ">Available Surplus Items</h2>
+        <p className="text-[15px] text-gray-500">4 items available</p>
       </section>
       <section className="py-8 px-4">
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
@@ -26,14 +21,23 @@ const FoodWasteMatter = () => {
             </div>
             <div className="p-4 border-2 border-t-0 border-gray-100 group-hover:border-orange-200 transition-colors duration-300">
               <h3 className="font-semibold text-lg mb-2">
-                Green Packaging Initiative
+                Fresh Pasta & vegetable Sauce
               </h3>
               <p className="text-gray-600 mb-4">
-                All our partner restaurants use biodegradable packaging made
-                from plant-based materials.
+                Homemade pasta with our signature vegetable sauce. Perfect for a
+                quick dinner!
               </p>
-              <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
-                Join Initiative
+              <div>
+                <p className="flex items-center gap-1 text-gray-400">
+                  <MapPin className="w-[15px] h-[15px]" /> Lois chop
+                </p>
+                <p className="flex items-center gap-2 text-green-700 font-bold">
+                  ₦10,000
+                  <span className=" text-gray-400  line-through">₦20,000 </span>
+                </p>
+              </div>
+              <button className="w-full cursor-pointer bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
+                Add to cart
               </button>
             </div>
           </div>
@@ -49,14 +53,23 @@ const FoodWasteMatter = () => {
             </div>
             <div className="p-4 border-2 border-t-0 border-gray-100 group-hover:border-orange-200 transition-colors duration-300">
               <h3 className="font-semibold text-lg mb-2">
-                Food Waste Reduction
+                Fresh Pasta & vegetable Sauce
               </h3>
               <p className="text-gray-600 mb-4">
-                Our platform helps restaurants reduce food waste by optimizing
-                portion sizes and donations.
+                Homemade pasta with our signature vegetable sauce. Perfect for a
+                quick dinner!
               </p>
-              <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
-                Learn More
+              <div>
+                <p className="flex items-center gap-1 text-gray-400">
+                  <MapPin className="w-[15px] h-[15px]" /> Lois chop
+                </p>
+                <p className="flex items-center gap-2 text-green-700 font-bold">
+                  ₦10,000
+                  <span className=" text-gray-400  line-through">₦20,000 </span>
+                </p>
+              </div>
+              <button className="w-full cursor-pointer bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
+                Add to cart
               </button>
             </div>
           </div>
@@ -71,14 +84,24 @@ const FoodWasteMatter = () => {
               />
             </div>
             <div className="p-4 border-2 border-t-0 border-gray-100 group-hover:border-orange-200 transition-colors duration-300">
-              <h3 className="font-semibold text-lg mb-2">Donate a Meal</h3>
+              <h3 className="font-semibold text-lg mb-2">
+                Fresh Pasta & vegetable Sauce
+              </h3>
               <p className="text-gray-600 mb-4">
-                Add ₦100 to your order to donate a meal to someone in need. We
-                partner with local food banks to distribute meals to those
-                facing food insecurity.
+                Homemade pasta with our signature vegetable sauce. Perfect for a
+                quick dinner!
               </p>
-              <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
-                Join Initiative
+              <div>
+                <p className="flex items-center gap-1 text-gray-400">
+                  <MapPin className="w-[15px] h-[15px]" /> Lois chop
+                </p>
+                <p className="flex items-center gap-2 text-green-700 font-bold">
+                  ₦10,000
+                  <span className=" text-gray-400  line-through">₦20,000 </span>
+                </p>
+              </div>
+              <button className="w-full cursor-pointer bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
+                Add to cart
               </button>
             </div>
           </div>
@@ -94,14 +117,23 @@ const FoodWasteMatter = () => {
             </div>
             <div className="p-4 border-2 border-t-0 border-gray-100 group-hover:border-orange-200 transition-colors duration-300">
               <h3 className="font-semibold text-lg mb-2">
-                Community Composting
+                Fresh Pasta & vegetable Sauce
               </h3>
               <p className="text-gray-600 mb-4">
-                We collect food scraps from our partner restaurants and turn
-                them into compost for local community gardens.
+                Homemade pasta with our signature vegetable sauce. Perfect for a
+                quick dinner!
               </p>
-              <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
-                Join Initiaitve
+              <div>
+                <p className="flex items-center gap-1 text-gray-400">
+                  <MapPin className="w-[15px] h-[15px]" /> Lois chop
+                </p>
+                <p className="flex items-center gap-2 text-green-700 font-bold">
+                  ₦10,000
+                  <span className=" text-gray-400  line-through">₦20,000 </span>
+                </p>
+              </div>
+              <button className="w-full cursor-pointer bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded transition-colors duration-300">
+                Add to cart
               </button>
             </div>
           </div>

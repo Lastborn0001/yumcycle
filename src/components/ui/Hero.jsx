@@ -12,7 +12,8 @@ const Hero = () => {
             with Purpose
           </h1>
           <p className="mt-4 max-w-xl text-lg text-gray-500 md:text-xl">
-            Order from your favorite restaurants while helping reduce food waste
+            Order from your favorite restaurants and discover surplus food at
+            great prices
           </p>
 
           <div className="relative mt-8 w-full max-w-lg">

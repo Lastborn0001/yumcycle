@@ -41,8 +41,8 @@ const HowItWork = () => {
             </div>
             <h3 className="mt-6 text-xl font-semibold">Find Restaurants</h3>
             <p className="mt-2 text-gray-500">
-              Browse our selection of restaurants, including those with food
-              waste initiatives
+              Browse our selection of restaurants and discover surplus food
+              deals
             </p>
           </div>
 
@@ -66,8 +66,8 @@ const HowItWork = () => {
             </div>
             <h3 className="mt-6 text-xl font-semibold">Place Your Order</h3>
             <p className="mt-2 text-gray-500">
-              Select your meals, customize as needed, and choose eco-friendly
-              options
+              Select your meals from regular menu or surplus items at discounted
+              prices
             </p>
           </div>
 
@@ -93,12 +93,10 @@ const HowItWork = () => {
                 <path d="M8.3 13.8c.5 1.3 1.4 2.4 2.7 3"></path>
               </svg>
             </div>
-            <h3 className="mt-6 text-xl font-semibold">
-              Enjoy & Make an Impact
-            </h3>
+            <h3 className="mt-6 text-xl font-semibold">Enjoy & Save</h3>
             <p className="mt-2 text-gray-500">
-              Receive your food and feel good about contributing to a more
-              sustainable future
+              Receive your food and feel good about saving money while reducing
+              waste
             </p>
           </div>
         </div>
