@@ -1,4 +1,4 @@
-import { BadgeDollarSign, Bell, Clock, Divide } from "lucide-react";
+import { Bell, Clock, Divide } from "lucide-react";
 import React from "react";
 
 const Help = () => {
@@ -7,7 +7,7 @@ const Help = () => {
       <h2 className="mb-6 text-center text-2xl font-semibold">
         How Food Surplus Works
       </h2>
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-lg bg-white p-5 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100">
             <Clock className="text-orange-600" />

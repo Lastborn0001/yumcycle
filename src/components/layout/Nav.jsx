@@ -157,10 +157,10 @@ const Nav = memo(() => {
             Restaurants
           </li>
           <li
-            onClick={() => handleNavigation("/foodWaste")}
+            onClick={() => handleNavigation("/food-surplus")}
             className="m-[0_15px] font-semibold xl:text-[14px] text-[12px] cursor-pointer transition hover:text-orange-500"
           >
-            Food Waste
+            Food Surplus
           </li>
           <li
             onClick={() => handleNavigation("/orders")}
@@ -301,10 +301,10 @@ const Nav = memo(() => {
                       Restaurants
                     </li>
                     <li
-                      onClick={() => handleNavigation("/foodWaste")}
+                      onClick={() => handleNavigation("/food-surplus")}
                       className="font-semibold text-[15px] cursor-pointer transition hover:text-orange-500"
                     >
-                      Food Waste
+                      Food Surplus
                     </li>
                     <li
                       onClick={() => handleNavigation("/orders")}

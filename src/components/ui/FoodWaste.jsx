@@ -21,7 +21,8 @@ const FoodWaste = () => {
           Get notified when restaurants post new surplus food items
         </p>
         <div className="flex justify-between">
-          <h6>Enable notifications</h6> <input type="checkbox" />
+          <h6>Enable notifications</h6>{" "}
+          <input className="accent-orange-500 " type="checkbox" />
         </div>
       </div>
     </section>
