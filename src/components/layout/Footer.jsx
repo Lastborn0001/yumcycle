@@ -73,10 +73,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/food-waste"
+                  href="/food-surplus"
                   className="text-gray-500 hover:text-orange-600"
                 >
-                  Food Waste Initiative
+                  Food Surplus
                 </Link>
               </li>
               <li>
