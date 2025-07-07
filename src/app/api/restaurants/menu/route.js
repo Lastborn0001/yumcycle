@@ -38,34 +38,32 @@ export async function GET(req) {
       }
       const menuItems = await MenuItem.find({
         restaurant: restaurantId,
-      }).lean();
-      return Response.json(menuItems, { status: 200 });
+      })
+        .populate("restaurant", "name")
+        .lean();
+      const transformedItems = menuItems.map((item) => ({
+        ...item,
+        restaurantName: item.restaurant?.name || "Unknown Restaurant",
+        originalPrice: item.originalPrice ?? item.price ?? 0,
+        surplusPrice: item.surplusPrice ?? null,
+      }));
+      return Response.json(transformedItems, { status: 200 });
+    } else {
+      // Fetch surplus items across all approved restaurants
+      const menuItems = await MenuItem.find({
+        isSurplus: true,
+        surplusPrice: { $exists: true, $ne: null },
+      })
+        .populate("restaurant", "name")
+        .lean();
+      const transformedItems = menuItems.map((item) => ({
+        ...item,
+        restaurantName: item.restaurant?.name || "Unknown Restaurant",
+        originalPrice: item.originalPrice ?? item.price ?? 0,
+        surplusPrice: item.surplusPrice ?? null,
+      }));
+      return Response.json(transformedItems, { status: 200 });
     }
-
-    const token = req.headers.get("authorization")?.split("Bearer ")[1];
-    if (!token) {
-      return Response.json(
-        { error: "Authorization token missing" },
-        { status: 401 }
-      );
-    }
-
-    const { uid } = await verifyRestaurantOwner(token);
-    const restaurant = await RestaurantProfile.findOne({ userId: uid });
-    if (!restaurant) {
-      return Response.json({ error: "Restaurant not found" }, { status: 404 });
-    }
-    if (restaurant.status !== "approved") {
-      return Response.json(
-        { error: "Restaurant not approved" },
-        { status: 403 }
-      );
-    }
-
-    const menuItems = await MenuItem.find({
-      restaurant: restaurant._id,
-    }).lean();
-    return Response.json(menuItems, { status: 200 });
   } catch (error) {
     console.error("Error fetching menu items:", error.message, error.stack);
     return Response.json(
