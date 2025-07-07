@@ -33,37 +33,37 @@ const RestaurantPage = () => {
     [cart]
   );
 
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const restaurantResponse = await fetch(`/api/restaurants/${id}`);
+      if (!restaurantResponse.ok) {
+        const errorData = await restaurantResponse.json();
+        throw new Error(errorData.error || "Restaurant not found");
+      }
+      const restaurantData = await restaurantResponse.json();
+      setRestaurant(restaurantData);
+
+      const menuResponse = await fetch(
+        `/api/restaurants/menu?restaurantId=${id}`
+      );
+      if (!menuResponse.ok) {
+        const errorData = await menuResponse.json();
+        throw new Error(errorData.error || "Failed to load menu items");
+      }
+      const menuData = await menuResponse.json();
+      console.log("Fetched menu items:", menuData); // Debug log
+      setMenuItems(menuData);
+    } catch (err) {
+      setError(err.message);
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const restaurantResponse = await fetch(`/api/restaurants/${id}`);
-        if (!restaurantResponse.ok) {
-          const errorData = await restaurantResponse.json();
-          throw new Error(errorData.error || "Restaurant not found");
-        }
-        const restaurantData = await restaurantResponse.json();
-        setRestaurant(restaurantData);
-
-        const menuResponse = await fetch(
-          `/api/restaurants/menu?restaurantId=${id}`
-        );
-        if (!menuResponse.ok) {
-          const errorData = await menuResponse.json();
-          throw new Error(errorData.error || "Failed to load menu items");
-        }
-        const menuData = await menuResponse.json();
-        setMenuItems(menuData);
-      } catch (err) {
-        setError(err.message);
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [id]);
 
@@ -78,12 +78,10 @@ const RestaurantPage = () => {
       // 2. Get the Firebase user token
       let userToken;
       try {
-        // Get the current user from Firebase auth
         const currentUser = auth.currentUser;
         if (!currentUser) {
           throw new Error("No authenticated user found");
         }
-
         userToken = await currentUser.getIdToken();
         if (!userToken) {
           throw new Error("Failed to get authentication token");
@@ -106,16 +104,21 @@ const RestaurantPage = () => {
         );
       }
 
-      // 4. Prepare complete item data
+      // 4. Prepare complete item data with correct price
+      const effectivePrice =
+        item.isSurplus && item.surplusPrice
+          ? item.surplusPrice
+          : item.originalPrice ?? item.price ?? 0;
       const itemToAdd = {
         _id: item._id,
         name: item.name,
-        price: item.price,
+        price: effectivePrice,
         restaurantId: id,
         restaurantName: restaurant?.name,
         image: item.image || "/placeholder-food.jpg",
         category: item.category || "general",
         description: item.description || "",
+        isSurplus: item.isSurplus || false,
       };
 
       // 5. Add to cart with the token
@@ -134,6 +137,7 @@ const RestaurantPage = () => {
       toast.error(error.message || "Failed to update cart");
     }
   };
+
   if (loading || cartStatus === "loading") return <Loading />;
   if (error)
     return <div className="text-center py-8 text-red-500">{error}</div>;
@@ -241,7 +245,21 @@ const RestaurantPage = () => {
                   <div className="p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-semibold">
-                        ₦{item.price}
+                        {item.isSurplus && item.surplusPrice ? (
+                          <>
+                            <span className="line-through text-gray-500">
+                              ₦
+                              {(item.originalPrice ?? item.price ?? 0).toFixed(
+                                2
+                              )}
+                            </span>{" "}
+                            <span>₦{item.surplusPrice.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          `₦${(item.originalPrice ?? item.price ?? 0).toFixed(
+                            2
+                          )}`
+                        )}
                       </span>
                       <Button
                         className="flex items-center gap-2 px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600"
@@ -268,7 +286,7 @@ const RestaurantPage = () => {
               {cart.map((item, index) => (
                 <div key={index} className="flex justify-between py-2">
                   <span>{item.name}</span>
-                  <span>₦{item.price}</span>
+                  <span>₦{item.price.toFixed(2)}</span>
                 </div>
               ))}
               <div className="mt-4 flex justify-end">

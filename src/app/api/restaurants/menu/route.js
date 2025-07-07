@@ -6,11 +6,9 @@ import admin from "@/libs/firebaseAdmin";
 import { uploadImage } from "@/libs/utils/cloudinary";
 
 async function verifyRestaurantOwner(token) {
-  // console.log("Verifying token for menu:", token?.slice(0, 20) + "...");
   try {
     const decoded = await admin.auth().verifyIdToken(token);
     const user = await User.findOne({ uid: decoded.uid });
-    // console.log("User found:", user ? user.uid : "none");
     if (!user || user.role !== "restaurant") {
       throw new Error("Unauthorized: Restaurant owner access required");
     }
@@ -22,20 +20,17 @@ async function verifyRestaurantOwner(token) {
 }
 
 export async function GET(req) {
-  // console.log("Handling GET /api/restaurants/menu");
   try {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
     const restaurantId = searchParams.get("restaurantId");
 
     if (restaurantId) {
-      // Public access for users
       const restaurant = await RestaurantProfile.findOne({
         _id: restaurantId,
         status: "approved",
       });
       if (!restaurant) {
-        // console.log("Restaurant not found or not approved:", restaurantId);
         return Response.json(
           { error: "Restaurant not found or not approved" },
           { status: 404 }
@@ -44,14 +39,11 @@ export async function GET(req) {
       const menuItems = await MenuItem.find({
         restaurant: restaurantId,
       }).lean();
-      // console.log("Menu items found for restaurant:", menuItems.length);
       return Response.json(menuItems, { status: 200 });
     }
 
-    // Authenticated access for restaurant owners
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token) {
-      // console.log("No token provided");
       return Response.json(
         { error: "Authorization token missing" },
         { status: 401 }
@@ -60,25 +52,19 @@ export async function GET(req) {
 
     const { uid } = await verifyRestaurantOwner(token);
     const restaurant = await RestaurantProfile.findOne({ userId: uid });
-    // console.log("Restaurant found:", restaurant ? restaurant._id : "none");
     if (!restaurant) {
-      // console.log("Restaurant not found for uid:", uid);
       return Response.json({ error: "Restaurant not found" }, { status: 404 });
     }
     if (restaurant.status !== "approved") {
-      // console.log("Restaurant not approved:", restaurant.status);
       return Response.json(
         { error: "Restaurant not approved" },
         { status: 403 }
       );
     }
 
-    // console.log("Querying menu items for restaurant:", restaurant._id);
     const menuItems = await MenuItem.find({
       restaurant: restaurant._id,
     }).lean();
-    // console.log("Menu items found:", menuItems.length);
-
     return Response.json(menuItems, { status: 200 });
   } catch (error) {
     console.error("Error fetching menu items:", error.message, error.stack);
@@ -96,11 +82,9 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  // console.log("Handling POST /api/restaurants/menu");
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token) {
-      // console.log("No token provided");
       throw new Error("Authorization token missing");
     }
 
@@ -108,57 +92,69 @@ export async function POST(req) {
     const { uid } = await verifyRestaurantOwner(token);
 
     const restaurant = await RestaurantProfile.findOne({ userId: uid });
-    // console.log("Restaurant found:", restaurant ? restaurant._id : "none");
     if (!restaurant) {
-      // console.log("Restaurant not found for uid:", uid);
       return Response.json({ error: "Restaurant not found" }, { status: 404 });
     }
     if (restaurant.status !== "approved") {
-      // console.log("Restaurant not approved:", restaurant.status);
       return Response.json(
         { error: "Restaurant not approved" },
         { status: 403 }
       );
     }
 
-    // console.log("Parsing FormData");
     const formData = await req.formData();
     const name = formData.get("name");
     const description = formData.get("description");
-    const price = formData.get("price");
+    const originalPrice = formData.get("originalPrice");
+    const surplusPrice = formData.get("surplusPrice");
+    const isSurplus = formData.get("isSurplus") === "true";
     const category = formData.get("category");
     const image = formData.get("image");
 
-    // console.log("FormData values:", {
-    //   name,
-    //   description,
-    //   price,
-    //   category,
-    //   image: image ? image.name : "none",
-    // });
-
-    if (!name || !price || !category) {
-      // console.log("Missing required fields:", { name, price, category });
+    if (!name || !originalPrice || !category) {
       return Response.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const parsedPrice = parseFloat(price);
-    if (isNaN(parsedPrice) || parsedPrice < 0) {
-      // console.log("Invalid price:", price);
-      return Response.json({ error: "Invalid price" }, { status: 400 });
+    const parsedOriginalPrice = parseFloat(originalPrice);
+    if (isNaN(parsedOriginalPrice) || parsedOriginalPrice < 0) {
+      return Response.json(
+        { error: "Invalid original price" },
+        { status: 400 }
+      );
+    }
+
+    let parsedSurplusPrice = null;
+    if (isSurplus) {
+      if (!surplusPrice) {
+        return Response.json(
+          { error: "Surplus price is required when marking as surplus" },
+          { status: 400 }
+        );
+      }
+      parsedSurplusPrice = parseFloat(surplusPrice);
+      if (isNaN(parsedSurplusPrice) || parsedSurplusPrice < 0) {
+        return Response.json(
+          { error: "Invalid surplus price" },
+          { status: 400 }
+        );
+      }
+      if (parsedSurplusPrice >= parsedOriginalPrice) {
+        return Response.json(
+          { error: "Surplus price must be lower than original price" },
+          { status: 400 }
+        );
+      }
     }
 
     let imageUrl = "";
     if (image && image.size > 0) {
-      // console.log("Uploading image to Cloudinary:", image.name);
       try {
         const buffer = Buffer.from(await image.arrayBuffer());
         const { url } = await uploadImage(buffer, image.name);
         imageUrl = url;
-        // console.log("Image uploaded successfully:", imageUrl);
       } catch (uploadError) {
         console.error(
           "Cloudinary upload error:",
@@ -172,17 +168,17 @@ export async function POST(req) {
       }
     }
 
-    // console.log("Creating menu item in MongoDB");
     const menuItem = await MenuItem.create({
       restaurant: restaurant._id,
       name,
       description,
-      price: parsedPrice,
+      originalPrice: parsedOriginalPrice,
+      surplusPrice: parsedSurplusPrice,
+      isSurplus,
       category,
       image: imageUrl,
     });
 
-    // console.log("Menu item created:", menuItem._id);
     return Response.json(menuItem, { status: 201 });
   } catch (error) {
     console.error("Error creating menu item:", error.message, error.stack);
@@ -194,6 +190,193 @@ export async function POST(req) {
           error.message.includes("not approved")
             ? 403
             : 500,
+      }
+    );
+  }
+}
+
+export async function PATCH(req) {
+  try {
+    const token = req.headers.get("authorization")?.split("Bearer ")[1];
+    if (!token) {
+      throw new Error("Authorization token missing");
+    }
+
+    await connectToDatabase();
+    const { uid } = await verifyRestaurantOwner(token);
+
+    const restaurant = await RestaurantProfile.findOne({ userId: uid });
+    if (!restaurant) {
+      return Response.json({ error: "Restaurant not found" }, { status: 404 });
+    }
+    if (restaurant.status !== "approved") {
+      return Response.json(
+        { error: "Restaurant not approved" },
+        { status: 403 }
+      );
+    }
+
+    const formData = await req.formData();
+    const itemId = formData.get("itemId");
+    const name = formData.get("name");
+    const description = formData.get("description");
+    const originalPrice = formData.get("originalPrice");
+    const surplusPrice = formData.get("surplusPrice");
+    const isSurplus = formData.get("isSurplus") === "true";
+    const category = formData.get("category");
+    const image = formData.get("image");
+
+    if (!itemId) {
+      return Response.json({ error: "Item ID is required" }, { status: 400 });
+    }
+
+    const menuItem = await MenuItem.findOne({
+      _id: itemId,
+      restaurant: restaurant._id,
+    });
+    if (!menuItem) {
+      return Response.json({ error: "Menu item not found" }, { status: 404 });
+    }
+
+    // Update fields only if provided
+    if (name) menuItem.name = name;
+    if (description) menuItem.description = description;
+    if (originalPrice) {
+      const parsedOriginalPrice = parseFloat(originalPrice);
+      if (isNaN(parsedOriginalPrice) || parsedOriginalPrice < 0) {
+        return Response.json(
+          { error: "Invalid original price" },
+          { status: 400 }
+        );
+      }
+      menuItem.originalPrice = parsedOriginalPrice;
+    }
+
+    // Handle surplusPrice
+    if (isSurplus) {
+      if (!surplusPrice) {
+        return Response.json(
+          { error: "Surplus price is required when marking as surplus" },
+          { status: 400 }
+        );
+      }
+      const parsedSurplusPrice = parseFloat(surplusPrice);
+      if (isNaN(parsedSurplusPrice) || parsedSurplusPrice < 0) {
+        return Response.json(
+          { error: "Invalid surplus price" },
+          { status: 400 }
+        );
+      }
+      if (parsedSurplusPrice >= menuItem.originalPrice) {
+        return Response.json(
+          { error: "Surplus price must be lower than original price" },
+          { status: 400 }
+        );
+      }
+      menuItem.surplusPrice = parsedSurplusPrice;
+    } else {
+      menuItem.surplusPrice = null; // Clear surplusPrice when not surplus
+    }
+    menuItem.isSurplus = isSurplus;
+
+    if (category && ["Main", "Side", "Drink", "Dessert"].includes(category)) {
+      menuItem.category = category;
+    }
+
+    // Handle image update
+    let imageUrl = menuItem.image;
+    if (image && image.size > 0) {
+      try {
+        const buffer = Buffer.from(await image.arrayBuffer());
+        const { url } = await uploadImage(buffer, image.name);
+        imageUrl = url;
+      } catch (uploadError) {
+        console.error(
+          "Cloudinary upload error:",
+          uploadError.message,
+          uploadError.stack
+        );
+        return Response.json(
+          { error: "Failed to upload image" },
+          { status: 500 }
+        );
+      }
+    }
+    menuItem.image = imageUrl;
+
+    await menuItem.save();
+    return Response.json(menuItem, { status: 200 });
+  } catch (error) {
+    console.error("Error updating menu item:", error.message, error.stack);
+    return Response.json(
+      { error: error.message || "Failed to update menu item" },
+      {
+        status:
+          error.message.includes("Unauthorized") ||
+          error.message.includes("not approved")
+            ? 403
+            : error.message.includes("not found")
+            ? 404
+            : 400,
+      }
+    );
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    const token = req.headers.get("authorization")?.split("Bearer ")[1];
+    if (!token) {
+      throw new Error("Authorization token missing");
+    }
+
+    await connectToDatabase();
+    const { uid } = await verifyRestaurantOwner(token);
+
+    const restaurant = await RestaurantProfile.findOne({ userId: uid });
+    if (!restaurant) {
+      return Response.json({ error: "Restaurant not found" }, { status: 404 });
+    }
+    if (restaurant.status !== "approved") {
+      return Response.json(
+        { error: "Restaurant not approved" },
+        { status: 403 }
+      );
+    }
+
+    const { searchParams } = new URL(req.url);
+    const itemId = searchParams.get("itemId");
+
+    if (!itemId) {
+      return Response.json({ error: "Item ID is required" }, { status: 400 });
+    }
+
+    const menuItem = await MenuItem.findOne({
+      _id: itemId,
+      restaurant: restaurant._id,
+    });
+    if (!menuItem) {
+      return Response.json({ error: "Menu item not found" }, { status: 404 });
+    }
+
+    await MenuItem.deleteOne({ _id: itemId });
+
+    return Response.json(
+      { message: "Menu item deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting menu item:", error.message, error.stack);
+    return Response.json(
+      { error: error.message || "Failed to delete menu item" },
+      {
+        status:
+          error.message.includes("Unauthorized") ||
+          error.message.includes("not approved")
+            ? 403
+            : error.message.includes("not found")
+            ? 404
+            : 400,
       }
     );
   }

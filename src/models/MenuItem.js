@@ -16,10 +16,19 @@ const menuItemSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    price: {
+    originalPrice: {
       type: Number,
-      required: [true, "Price is required"],
-      min: [0, "Price must be at least 0"],
+      required: [true, "Original price is required"],
+      min: [0, "Original price must be at least 0"],
+    },
+    surplusPrice: {
+      type: Number,
+      min: [0, "Surplus price must be at least 0"],
+      default: null,
+    },
+    isSurplus: {
+      type: Boolean,
+      default: false,
     },
     category: {
       type: String,

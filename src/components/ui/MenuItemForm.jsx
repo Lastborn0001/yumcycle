@@ -6,7 +6,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
+    originalPrice: "",
     category: "Main",
     image: null,
   });
@@ -46,7 +46,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
       const data = new FormData();
       data.append("name", formData.name);
       data.append("description", formData.description);
-      data.append("price", formData.price);
+      data.append("originalPrice", formData.originalPrice);
       data.append("category", formData.category);
       if (formData.image) {
         data.append("image", formData.image);
@@ -60,7 +60,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
       setFormData({
         name: "",
         description: "",
-        price: "",
+        originalPrice: "",
         category: "Main",
         image: null,
       });
@@ -112,8 +112,8 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
           </label>
           <input
             type="number"
-            name="price"
-            value={formData.price}
+            name="originalPrice"
+            value={formData.originalPrice}
             onChange={handleChange}
             required
             min="0"
