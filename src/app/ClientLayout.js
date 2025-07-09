@@ -1,11 +1,12 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/libs/AuthContext";
+import Loading from "@/components/ui/Loading";
 
 function InnerLayout({ children }) {
   const { loading } = useAuth();
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (loading) return <Loading />;
 
   return children;
 }
