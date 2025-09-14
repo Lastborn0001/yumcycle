@@ -1,18 +1,18 @@
 import React from "react";
 import { Bell, Search, LogOut, Menu, User } from "lucide-react";
 
-const Header = ({ onLogout, toggleSidebar, sidebarCollapsed }) => {
+const Header = ({ onLogout, toggleSidebar }) => {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
       {/* Left Section */}
       <div className="flex items-center space-x-4">
-        <button
+        {/* <button
           onClick={toggleSidebar}
           className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
           title="Toggle sidebar"
         >
           <Menu className="w-5 h-5 text-gray-600" />
-        </button>
+        </button> */}
 
         <div className="hidden md:block">
           <h2 className="text-xl font-semibold text-gray-900">Dashboard</h2>

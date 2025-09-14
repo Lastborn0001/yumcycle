@@ -49,7 +49,7 @@ const Sidebar = ({ activeView, setActiveView, collapsed, setCollapsed }) => {
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <Utensils className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+            <h1 className="text-xl font-bold text-gray-900">Yumcycle</h1>
           </div>
         )}
         <button
@@ -75,7 +75,10 @@ const Sidebar = ({ activeView, setActiveView, collapsed, setCollapsed }) => {
             return (
               <li key={item.id}>
                 <button
-                  onClick={() => setActiveView(item.id)}
+                  onClick={() => {
+                    console.log("Setting activeView to:", item.id); // Debug log
+                    setActiveView(item.id);
+                  }}
                   className={`w-full flex items-center px-3 py-3 rounded-lg text-left transition-all duration-200 group ${
                     isActive
                       ? "bg-orange-50 text-orange-700 border-r-2 border-orange-500"

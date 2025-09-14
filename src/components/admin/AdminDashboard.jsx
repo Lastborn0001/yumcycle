@@ -9,6 +9,7 @@ import Sidebar from "@/components/admin/Sidebar";
 import Header from "@/components/admin/Header";
 import RestaurantsTable from "@/components/info/RestaurantsTable";
 import UsersTable from "@/components/table/UsersTable";
+import Analytics from "@/components/analytic/Analytics"; // Ensure correct path
 
 const AdminDashboard = () => {
   const router = useRouter();
@@ -74,6 +75,8 @@ const AdminDashboard = () => {
     );
   }
 
+ 
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Toaster position="top-right" />
@@ -103,6 +106,12 @@ const AdminDashboard = () => {
             )}
             {activeView === "users" && (
               <UsersTable getAuthToken={getAuthToken} />
+            )}
+            {activeView === "analytics" && (
+              <Analytics getAuthToken={getAuthToken} />
+            )}
+            {activeView === "settings" && (
+              <div>Settings View (To be implemented)</div>
             )}
           </div>
         </main>
