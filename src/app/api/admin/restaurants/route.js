@@ -1,72 +1,90 @@
+import { NextResponse } from 'next/server';
+import { getAuth } from 'firebase-admin/auth';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { connectToDatabase } from "@/libs/db/mongo";
-import RestaurantProfile from "@/models/RestaurantProfile";
-import User from "@/models/User";
-import admin from "@/libs/firebaseAdmin";
-import { getAuth } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import RestaurantProfile from '@/models/RestaurantProfile';
+import User from '@/models/User';
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-
-// Middleware to verify admin role
-async function verifyAdmin(token) {
-  try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    if (decoded.role !== "admin") {
-      throw new Error("Unauthorized: Admin access required");
-    }
-    return decoded;
-  } catch (error) {
-    throw new Error("Invalid or expired token");
-  }
+// Initialize Firebase Admin
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
 }
 
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const status = searchParams.get("status") || "pending";
-
+// Verify admin role
+const verifyAdmin = async (token) => {
   try {
-    // Verify admin
-    const token = req.headers.get("authorization")?.split("Bearer ")[1];
-    if (!token) throw new Error("Authorization token missing");
+    const decodedToken = await getAuth().verifyIdToken(token);
+    await connectToDatabase();
+    
+    const user = await User.findOne({ uid: decodedToken.uid });
+    if (!user || user.role !== 'admin') {
+      throw new Error('Unauthorized: Admin access required');
+    }
+    
+    return user;
+  } catch (error) {
+    throw new Error('Authentication failed');
+  }
+};
+
+export async function GET(request) {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Missing or invalid authorization header' }, { status: 401 });
+    }
+
+    const token = authHeader.split('Bearer ')[1];
     await verifyAdmin(token);
 
     await connectToDatabase();
 
-    // Fetch restaurants
-    const restaurants = await RestaurantProfile.find({ status }).lean();
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
 
-    // Manually populate userId
-    const restaurantIds = restaurants.map((r) => r.userId);
-    const users = await User.find({ uid: { $in: restaurantIds } })
-      .select("name email uid")
-      .lean();
+    // Build query
+    let query = {};
+    if (status && status !== 'all') {
+      query.status = status;
+    }
 
-    // Map users to restaurants
-    const userMap = new Map(users.map((user) => [user.uid, user]));
-    const populatedRestaurants = restaurants.map((restaurant) => ({
-      ...restaurant,
-      userId: userMap.get(restaurant.userId) || null, // Null if no matching user
-    }));
+    // Fetch restaurants with user data populated
+    const restaurants = await RestaurantProfile.aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: 'uid',
+          as: 'userDetails'
+        }
+      },
+      {
+        $addFields: {
+          userId: { $arrayElemAt: ['$userDetails', 0] }
+        }
+      },
+      {
+        $project: {
+          userDetails: 0
+        }
+      },
+      { $sort: { createdAt: -1 } }
+    ]);
 
-    return Response.json(populatedRestaurants, { status: 200 });
+    return NextResponse.json(restaurants);
   } catch (error) {
-    console.error(
-      "Error fetching restaurants:",
-      JSON.stringify(error, null, 2)
-    );
-    return Response.json(
-      { error: error.message || "Failed to fetch restaurants" },
-      { status: error.message.includes("Unauthorized") ? 403 : 500 }
+    console.error('Error fetching restaurants:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to fetch restaurants' },
+      { status: 500 }
     );
   }
 }
@@ -90,7 +108,7 @@ export async function POST(req) {
     await connectToDatabase();
 
     if (action === "approve") {
-      // Update RestaurantProfile and User status to "approved"
+      // Update RestaurantProfile status to "approved" and User role to "restaurant"
       const [restaurant, user] = await Promise.all([
         RestaurantProfile.findByIdAndUpdate(
           restaurantId,
@@ -98,64 +116,63 @@ export async function POST(req) {
           { new: true }
         ),
         User.findOneAndUpdate(
-          { uid: userId }, // Query by Firebase UID
-          { status: "approved" },
+          { uid: userId },
+          { role: "restaurant" }, // Change role to restaurant when approved
           { new: true }
         ),
       ]);
 
-      if (!restaurant || !user) {
+      if (!restaurant) {
         return Response.json(
-          { error: "Restaurant or user not found" },
+          { error: "Restaurant not found" },
           { status: 404 }
         );
       }
 
-      return Response.json({ success: true }, { status: 200 });
+      return Response.json({ success: true, message: "Restaurant approved successfully" }, { status: 200 });
+      
     } else if (action === "reject") {
-      // Update RestaurantProfile and User status to "rejected"
-      const [restaurant, user] = await Promise.all([
-        RestaurantProfile.findByIdAndUpdate(
-          restaurantId,
-          { status: "rejected" },
-          { new: true }
-        ),
-        User.findOneAndUpdate(
-          { uid: userId }, // Query by Firebase UID
-          { status: "rejected" },
-          { new: true }
-        ),
-      ]);
+      // Update RestaurantProfile status to "rejected"
+      const restaurant = await RestaurantProfile.findByIdAndUpdate(
+        restaurantId,
+        { status: "rejected" },
+        { new: true }
+      );
 
-      if (!restaurant || !user) {
+      if (!restaurant) {
         return Response.json(
-          { error: "Restaurant or user not found" },
+          { error: "Restaurant not found" },
           { status: 404 }
         );
       }
 
-      return Response.json({ success: true }, { status: 200 });
+      return Response.json({ success: true, message: "Restaurant rejected successfully" }, { status: 200 });
+      
     } else if (action === "delete") {
-      // Delete RestaurantProfile, User, and Firebase user
-      const [restaurant, user] = await Promise.all([
+      // Delete RestaurantProfile and optionally reset user role
+      const [restaurant] = await Promise.all([
         RestaurantProfile.findByIdAndDelete(restaurantId),
-        User.findOneAndDelete({ uid: userId }), // Query by Firebase UID
-        admin.auth().deleteUser(userId), // Firebase user deletion
+        User.findOneAndUpdate(
+          { uid: userId },
+          { role: "user" }, // Reset role back to user
+          { new: true }
+        ),
       ]);
 
-      if (!restaurant || !user) {
+      if (!restaurant) {
         return Response.json(
-          { error: "Restaurant or user not found" },
+          { error: "Restaurant not found" },
           { status: 404 }
         );
       }
 
-      return Response.json({ success: true }, { status: 200 });
+      return Response.json({ success: true, message: "Restaurant deleted successfully" }, { status: 200 });
+      
     } else {
       return Response.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
-    console.error("Error processing request:", JSON.stringify(error, null, 2));
+    console.error("Error processing request:", error);
     return Response.json(
       { error: error.message || "Failed to process request" },
       { status: error.message.includes("Unauthorized") ? 403 : 500 }
