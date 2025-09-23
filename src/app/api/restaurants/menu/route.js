@@ -1,3 +1,4 @@
+// src/app/api/restaurants/menu/route.js
 import { connectToDatabase } from "@/libs/db/mongo";
 import RestaurantProfile from "@/models/RestaurantProfile";
 import MenuItem from "@/models/MenuItem";

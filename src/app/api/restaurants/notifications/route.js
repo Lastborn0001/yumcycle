@@ -1,3 +1,4 @@
+// src/app/api/restaurants/notifications/route.js
 import { connectToDatabase } from "@/libs/db/mongo";
 import Notification from "@/models/Notification";
 import admin from "@/libs/firebaseAdmin";
