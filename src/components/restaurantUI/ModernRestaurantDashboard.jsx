@@ -6,14 +6,10 @@ import { app } from "@/libs/firebase-client";
 import { toast, Toaster } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Package } from "lucide-react";
-
-// Import our new components
 import ModernHeader from "./ModernHeader";
 import ModernNavigation from "./ModernNavigation";
 import RestaurantInfoCard from "./RestaurantInfoCard";
 import AnalyticsDashboard from "./AnalyticalDashboard";
-
-// Import existing components (assuming they exist)
 import OrderCard from "@/components/ui/OrderCard";
 import MenuItemForm from "@/components/ui/MenuItemForm";
 import MenuItemList from "@/components/ui/MenuItemList";

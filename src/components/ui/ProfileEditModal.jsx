@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { getAuth } from "firebase/auth";
-import { app } from "@/libs/firebase-client"; // Adjust path to your Firebase config
+import { app } from "@/libs/firebase-client"; 
 
 const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
   const [formData, setFormData] = useState({
