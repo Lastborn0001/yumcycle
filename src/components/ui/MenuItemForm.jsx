@@ -361,7 +361,7 @@ const MenuItemForm = ({ onSubmit, restaurantId }) => {
             whileTap={{ scale: submitting ? 1 : 0.98 }}
             type="submit"
             disabled={submitting}
-            className={`w-full py-4 px-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-lg font-semibold rounded-xl transition-all duration-200 ${
+            className={`w-full cursor-pointer py-4 px-6 bg-gradient-to-r from-orange-500 to-orange-600 text-white text-lg font-semibold rounded-xl transition-all duration-200 ${
               submitting
                 ? "opacity-70 cursor-not-allowed"
                 : "hover:from-orange-600 hover:to-orange-700 hover:shadow-lg"

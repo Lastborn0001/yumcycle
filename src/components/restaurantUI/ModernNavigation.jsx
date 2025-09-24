@@ -81,7 +81,7 @@ const ModernNavigation = ({ activeTab, onTabChange, notifications = [] }) => {
                 <motion.button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
-                  className={`relative group flex items-center px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                  className={`relative group flex items-center cursor-pointer px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                     isActive
                       ? `bg-gradient-to-r ${tab.color} text-white shadow-lg shadow-black/10`
                       : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"

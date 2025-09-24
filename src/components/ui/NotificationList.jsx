@@ -210,7 +210,7 @@ const NotificationList = ({ notifications = [], onMarkAsRead }) => {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => onMarkAsRead(notification._id)}
-                              className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                              className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
                             >
                               <CheckCircle2 className="h-4 w-4" />
                               <span>Mark as Read</span>

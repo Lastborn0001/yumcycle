@@ -159,7 +159,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 cursor-pointer text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -282,7 +282,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
                       <button
                         type="button"
                         onClick={handleSubmit}
-                        className="text-red-600 underline hover:text-red-700 text-sm mt-1"
+                        className="text-red-600 underline cursor-pointer hover:text-red-700 text-sm mt-1"
                       >
                         Try again
                       </button>
@@ -296,7 +296,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                  className="flex-1 cursor-pointer px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -305,7 +305,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
                   whileTap={{ scale: submitting ? 1 : 0.98 }}
                   type="submit"
                   disabled={submitting}
-                  className={`flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl transition-all duration-200 font-medium ${
+                  className={`flex-1 cursor-pointer px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl transition-all duration-200 font-medium ${
                     submitting
                       ? "opacity-70 cursor-not-allowed"
                       : "hover:from-orange-600 hover:to-orange-700 hover:shadow-lg"

@@ -20,8 +20,9 @@ const ErrorDisplay = () => {
         </motion.button>
         {error.includes("forbidden") && (
           <p className="mt-4 text-sm text-gray-500">
-            Your restaurant is not yet approved. Please contact support or wait
-            for admin approval.
+            Your restaurant is not yet approved. Please contact{" "}
+            <a href="mailto:loisobi16@gmail.com">support</a> or wait for admin
+            approval.
           </p>
         )}
       </motion.div>

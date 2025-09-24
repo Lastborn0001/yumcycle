@@ -279,7 +279,7 @@ const MenuItemList = ({ items = [], restaurantId, app, refreshMenuItems }) => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleEditClick(item)}
-                      className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium"
+                      className="flex-1 flex items-center cursor-pointer justify-center space-x-2 px-4 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors font-medium"
                     >
                       <Edit2 className="h-4 w-4" />
                       <span>Edit</span>
@@ -289,7 +289,7 @@ const MenuItemList = ({ items = [], restaurantId, app, refreshMenuItems }) => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleDelete(item._id)}
-                      className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-colors font-medium"
+                      className="flex-1 flex items-center cursor-pointer justify-center space-x-2 px-4 py-3 bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-colors font-medium"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span>Delete</span>
@@ -324,7 +324,7 @@ const MenuItemList = ({ items = [], restaurantId, app, refreshMenuItems }) => {
                 </h2>
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 cursor-pointer text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
@@ -347,7 +347,7 @@ const MenuItemList = ({ items = [], restaurantId, app, refreshMenuItems }) => {
                       <button
                         type="button"
                         onClick={() => setImagePreview(null)}
-                        className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                        className="absolute top-3 right-3 cursor-pointer p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -475,14 +475,14 @@ const MenuItemList = ({ items = [], restaurantId, app, refreshMenuItems }) => {
                   <button
                     type="button"
                     onClick={() => setIsEditing(false)}
-                    className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                    className="flex-1 cursor-pointer px-6 py-3 border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updating}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-colors font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="flex-1 cursor-pointer px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-colors font-medium disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {updating ? (
                       <div className="flex items-center justify-center space-x-2">
