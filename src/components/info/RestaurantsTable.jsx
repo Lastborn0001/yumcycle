@@ -311,7 +311,7 @@ const RestaurantsTable = ({ getAuthToken }) => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm text-gray-900">
                         <MapPin className="w-4 h-4 text-gray-400 mr-1" />
-                        {restaurant.address || "No address"}
+                        {restaurant.location || "No address"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

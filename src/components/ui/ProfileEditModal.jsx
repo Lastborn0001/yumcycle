@@ -7,6 +7,7 @@ import {
   Save,
   ImageIcon,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { getAuth } from "firebase/auth";
@@ -17,6 +18,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
   const [formData, setFormData] = useState({
     image: null,
     isEcoFriendly: restaurant?.isEcoFriendly || false,
+    location: restaurant?.location || "",
   });
   const [preview, setPreview] = useState(restaurant?.image || "");
   const [submitting, setSubmitting] = useState(false);
@@ -27,6 +29,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
     setFormData({
       image: null,
       isEcoFriendly: restaurant?.isEcoFriendly || false,
+      location: restaurant?.location || "",
     });
     setPreview(restaurant?.image || "");
     setError(null);
@@ -76,6 +79,10 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
     setFormData((prev) => ({ ...prev, isEcoFriendly: e.target.checked }));
   };
 
+  const handleLocationChange = (e) => {
+    setFormData((prev) => ({ ...prev, location: e.target.value }));
+  };
+
   const removeImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
     setPreview(restaurant?.image || "");
@@ -99,6 +106,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
         data.append("image", formData.image);
       }
       data.append("isEcoFriendly", formData.isEcoFriendly);
+      data.append("location", formData.location);
 
       const response = await fetch("/api/restaurants/profile", {
         method: "PATCH",
@@ -159,7 +167,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
             </div>
             <button
               onClick={onClose}
-              className="p-2 cursor-pointer text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="h-5 w-5" />
             </button>
@@ -226,6 +234,28 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
                   onChange={handleFileInput}
                   className="hidden"
                 />
+              </div>
+
+              {/* Location Input */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-3">
+                  Restaurant Location
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <MapPin className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    value={formData.location}
+                    onChange={handleLocationChange}
+                    placeholder="Enter your restaurant address"
+                    className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  This helps customers find your restaurant location
+                </p>
               </div>
 
               {/* Eco-Friendly Toggle */}
@@ -296,7 +326,7 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 cursor-pointer px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                  className="flex-1 px-6 py-3 border-2 border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                 >
                   Cancel
                 </button>

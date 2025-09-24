@@ -4,6 +4,7 @@ const restaurantProfileSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   name: { type: String, required: true },
   image: { type: String },
+  location: { type: String },
   cuisine: [{ type: String }],
   rating: { type: Number, default: 0 },
   minOrder: { type: Number, default: 0 },
