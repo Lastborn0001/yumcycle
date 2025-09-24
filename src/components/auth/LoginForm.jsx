@@ -85,7 +85,7 @@ export default function AuthForms() {
         if (role === "restaurant") {
           registrationData.restaurantData = {
             name: restaurantName,
-            address: restaurantAddress,
+            location: restaurantAddress,
             cuisine: restaurantCuisine.split(",").map((c) => c.trim()),
           };
         }
