@@ -1,39 +1,50 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Clock,
   CheckCircle,
   XCircle,
-  Loader2,
-  Phone,
-  MapPin,
-  ShoppingBag,
-  DollarSign,
-  Calendar,
-  AlertTriangle,
+  Truck,
+  UtensilsCrossed,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function OrderCard({ order, onUpdateStatus }) {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [updateError, setUpdateError] = useState(null);
-
+export default function OrderCard({ order, onUpdateStatus, onClick }) {
   const getStatusConfig = (status) => {
     const configs = {
       pending: {
         icon: Clock,
-        color: "text-amber-600",
-        bgColor: "bg-amber-50",
-        borderColor: "border-amber-200",
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-200",
         label: "Pending",
-        gradient: "from-amber-400 to-amber-500",
+      },
+      preparing: {
+        icon: UtensilsCrossed,
+        color: "text-blue-600",
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-200",
+        label: "Preparing",
+      },
+      "in-transit": {
+        icon: Truck,
+        color: "text-purple-600",
+        bgColor: "bg-purple-50",
+        borderColor: "border-purple-200",
+        label: "In Transit",
+      },
+      delivered: {
+        icon: CheckCircle,
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
+        label: "Delivered",
       },
       completed: {
         icon: CheckCircle,
-        color: "text-emerald-600",
-        bgColor: "bg-emerald-50",
-        borderColor: "border-emerald-200",
+        color: "text-green-600",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
         label: "Completed",
-        gradient: "from-emerald-400 to-emerald-500",
       },
       cancelled: {
         icon: XCircle,
@@ -41,30 +52,9 @@ export default function OrderCard({ order, onUpdateStatus }) {
         bgColor: "bg-red-50",
         borderColor: "border-red-200",
         label: "Cancelled",
-        gradient: "from-red-400 to-red-500",
-      },
-      failed: {
-        icon: AlertTriangle,
-        color: "text-red-600",
-        bgColor: "bg-red-50",
-        borderColor: "border-red-200",
-        label: "Failed",
-        gradient: "from-red-400 to-red-500",
       },
     };
     return configs[status] || configs.pending;
-  };
-
-  const handleStatusUpdate = async (newStatus) => {
-    setIsUpdating(true);
-    setUpdateError(null);
-    try {
-      await onUpdateStatus(order._id, newStatus);
-    } catch (error) {
-      setUpdateError(error.message);
-    } finally {
-      setIsUpdating(false);
-    }
   };
 
   const formatDate = (dateString) => {
@@ -83,181 +73,48 @@ export default function OrderCard({ order, onUpdateStatus }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
+      whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
-      className={`bg-white rounded-2xl shadow-sm border ${statusConfig.borderColor} overflow-hidden hover:shadow-lg transition-all duration-200`}
+      onClick={onClick}
+      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
     >
-      {/* Header with Status */}
-      <div
-        className={`${statusConfig.bgColor} px-6 py-4 border-b ${statusConfig.borderColor}`}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div
-              className={`p-2 ${statusConfig.bgColor} rounded-xl ${statusConfig.borderColor} border`}
-            >
-              <StatusIcon className={`h-5 w-5 ${statusConfig.color}`} />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">
-                Order #{order._id.toString().slice(-6)}
-              </h3>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Calendar className="h-4 w-4" />
-                <span>{formatDate(order.createdAt)}</span>
-              </div>
-            </div>
-          </div>
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-medium ${statusConfig.color} ${statusConfig.bgColor} border ${statusConfig.borderColor}`}
-          >
-            {statusConfig.label}
-          </div>
-        </div>
-      </div>
-
-      {/* Order Content */}
       <div className="p-6">
-        {/* Customer Information */}
-        <div className="mb-6 space-y-3">
-          <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
-            Customer Details
-          </h4>
-          <div className="grid grid-cols-1 gap-3">
-            {order.phoneNumber && (
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <Phone className="h-4 w-4 text-blue-600" />
-                </div>
-                <span>{order.phoneNumber}</span>
-              </div>
-            )}
-            {order.address && (
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <div className="p-2 bg-green-50 rounded-lg">
-                  <MapPin className="h-4 w-4 text-green-600" />
-                </div>
-                <span className="line-clamp-2">{order.address}</span>
-              </div>
-            )}
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="font-semibold text-lg mb-1">
+              Order #{order._id.slice(-6)}
+            </h3>
+            <p className="text-sm text-gray-500 flex items-center gap-1">
+              <Clock className="h-4 w-4" />
+              {formatDate(order.createdAt)}
+            </p>
           </div>
+          <span className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${statusConfig.bgColor} ${statusConfig.color}`}>
+            <StatusIcon className="h-4 w-4" />
+            <span>{statusConfig.label}</span>
+          </span>
         </div>
 
-        {/* Order Items */}
-        <div className="mb-6">
-          <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
-            Order Items
-          </h4>
-          <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+        <div className="space-y-2 mb-4">
+          <p className="text-sm text-gray-600">
+            Customer: {order.phoneNumber}
+          </p>
+          <p className="text-sm text-gray-600 line-clamp-1">
+            Address: {order.address}
+          </p>
+          <div className="border-t pt-2 mt-2">
             {order.items.map((item, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-orange-600 font-semibold text-sm">
-                      {item.quantity}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ₦{item.price.toLocaleString()} each
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-gray-900">
-                    ₦{(item.price * item.quantity).toLocaleString()}
-                  </p>
-                </div>
+              <div key={index} className="text-sm text-gray-600">
+                {item.quantity}x {item.name}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Total */}
-        <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="h-5 w-5 text-orange-600" />
-              <span className="font-semibold text-gray-900">Total Amount</span>
-            </div>
-            <span className="text-2xl font-bold text-orange-600">
-              ₦{order.total.toLocaleString()}
-            </span>
-          </div>
+        <div className="flex items-center justify-between pt-2 border-t">
+          <span className="text-sm font-medium">Total</span>
+          <span className="font-semibold">₦{order.total.toLocaleString()}</span>
         </div>
-
-        {/* Error Display */}
-        {updateError && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl"
-          >
-            <div className="flex items-center space-x-2">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-              <p className="text-red-700 text-sm">{updateError}</p>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Action Buttons */}
-        {order.status === "pending" && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
-              Quick Actions
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleStatusUpdate("completed")}
-                disabled={isUpdating}
-                className={`flex items-center justify-center space-x-3 px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-medium ${
-                  isUpdating
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:shadow-lg"
-                }`}
-              >
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Updating...</span>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4" />
-                    <span>Mark Complete</span>
-                  </>
-                )}
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleStatusUpdate("cancelled")}
-                disabled={isUpdating}
-                className={`flex items-center justify-center space-x-3 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium ${
-                  isUpdating
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:shadow-lg"
-                }`}
-              >
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Updating...</span>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-4 w-4" />
-                    <span>Cancel Order</span>
-                  </>
-                )}
-              </motion.button>
-            </div>
-          </div>
-        )}
       </div>
     </motion.div>
   );

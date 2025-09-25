@@ -16,6 +16,8 @@ import MenuItemList from "@/components/ui/MenuItemList";
 import NotificationList from "@/components/ui/NotificationList";
 import ProfileEditModal from "@/components/ui/ProfileEditModal";
 import Loading from "@/components/ui/Loading";
+import OrderDetailsModal from "@/components/ui/OrderDetailsModal";
+import { ArrowRight } from "lucide-react";
 
 export default function ModernRestaurantDashboard() {
   const router = useRouter();
@@ -27,6 +29,44 @@ export default function ModernRestaurantDashboard() {
   const [error, setError] = useState(null);
   const [restaurant, setRestaurant] = useState(null);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    try {
+      const auth = getAuth(app);
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error("Please log in to update orders");
+        return;
+      }
+
+      const token = await user.getIdToken();
+      const response = await fetch("/api/restaurants/orders", {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId,
+          status: newStatus,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update order status");
+      }
+
+      const { order } = await response.json();
+      setOrders(
+        orders.map((o) => (o._id === orderId ? { ...o, status: newStatus } : o))
+      );
+      toast.success("Order status updated to " + newStatus);
+    } catch (err) {
+      console.error("Update status error:", err);
+      toast.error(err.message);
+    }
+  };
 
   useEffect(() => {
     const auth = getAuth(app);
@@ -465,15 +505,25 @@ export default function ModernRestaurantDashboard() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.05 }}
-                        whileHover={{ y: -5 }}
                       >
                         <OrderCard
                           order={order}
-                          onUpdateStatus={handleUpdateOrderStatus}
+                          onUpdateStatus={handleStatusUpdate}
+                          onClick={() => setSelectedOrder(order)}
                         />
                       </motion.div>
                     ))}
                   </div>
+                )}
+
+                {selectedOrder && (
+                  <OrderDetailsModal
+                    order={selectedOrder}
+                    onClose={() => setSelectedOrder(null)}
+                    onStatusChange={(newStatus) => {
+                      handleStatusUpdate(selectedOrder._id, newStatus);
+                    }}
+                  />
                 )}
               </div>
             )}

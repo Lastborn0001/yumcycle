@@ -14,7 +14,7 @@ const OrderSchema = new mongoose.Schema({
       price: { type: Number, required: true },
       quantity: { type: Number, required: true },
       restaurantName: { type: String, required: true },
-      restaurantId: { type: String, required: true }, // String in items
+      restaurantId: { type: String, required: true },
     },
   ],
   subtotal: { type: Number, required: true },
@@ -29,7 +29,15 @@ const OrderSchema = new mongoose.Schema({
   paymentIntentId: { type: String },
   status: {
     type: String,
-    enum: ["pending", "completed", "failed", "cancelled"],
+    enum: [
+      "pending",
+      "preparing",
+      "in-transit",
+      "delivered",
+      "completed",
+      "failed",
+      "cancelled",
+    ],
     default: "pending",
   },
   createdAt: { type: Date, default: Date.now },
