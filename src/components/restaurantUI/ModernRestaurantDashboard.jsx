@@ -124,27 +124,29 @@ export default function ModernRestaurantDashboard() {
       setError(null);
 
       const token = await user.getIdToken();
-      const [profileRes, ordersRes, menuRes, notificationsRes] =
-        await Promise.all([
-          fetch("/api/restaurants/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/restaurants/orders", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/restaurants/menu", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/restaurants/notifications", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+      // First get the profile to get the restaurant ID
+      const profileRes = await fetch("/api/restaurants/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (!profileRes.ok) {
         const error = await profileRes.text();
         throw new Error(error || "Failed to fetch profile");
       }
       const profileData = await profileRes.json();
+
+      // Then fetch other data using the restaurant ID
+      const [ordersRes, menuRes, notificationsRes] = await Promise.all([
+        fetch("/api/restaurants/orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("/api/restaurants/menu?restaurantId=" + profileData._id, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch("/api/restaurants/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
 
       // Check if restaurant is approved - redirect if not
       if (profileData.status !== "approved") {

@@ -89,16 +89,16 @@ export default function OrderCard({ order, onUpdateStatus, onClick }) {
               {formatDate(order.createdAt)}
             </p>
           </div>
-          <span className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${statusConfig.bgColor} ${statusConfig.color}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${statusConfig.bgColor} ${statusConfig.color}`}
+          >
             <StatusIcon className="h-4 w-4" />
             <span>{statusConfig.label}</span>
           </span>
         </div>
 
         <div className="space-y-2 mb-4">
-          <p className="text-sm text-gray-600">
-            Customer: {order.phoneNumber}
-          </p>
+          <p className="text-sm text-gray-600">Customer: {order.phoneNumber}</p>
           <p className="text-sm text-gray-600 line-clamp-1">
             Address: {order.address}
           </p>

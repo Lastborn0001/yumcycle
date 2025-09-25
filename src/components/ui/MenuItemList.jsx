@@ -2,13 +2,8 @@ import React, { useState } from "react";
 import {
   Edit2,
   Trash2,
-  DollarSign,
-  Tag,
-  FileText,
   X,
   Save,
-  AlertTriangle,
-  CheckCircle,
   Utensils,
   Upload,
   ImageIcon,
