@@ -105,6 +105,16 @@ export default function ModernRestaurantDashboard() {
         throw new Error(error || "Failed to fetch profile");
       }
       const profileData = await profileRes.json();
+
+      // Check if restaurant is approved - redirect if not
+      if (profileData.status !== "approved") {
+        setError(
+          `Your restaurant account is ${profileData.status}. Only approved restaurants can access the dashboard.`
+        );
+        setLoading(false);
+        return;
+      }
+
       setRestaurant(profileData);
 
       if (!ordersRes.ok) {

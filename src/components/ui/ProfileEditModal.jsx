@@ -17,10 +17,10 @@ import { motion, AnimatePresence } from "framer-motion";
 const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
   const [formData, setFormData] = useState({
     image: null,
-    isEcoFriendly: restaurant?.isEcoFriendly || false,
-    location: restaurant?.location || "",
+    isEcoFriendly: restaurant.isEcoFriendly || false,
+    location: restaurant.location || "",
   });
-  const [preview, setPreview] = useState(restaurant?.image || "");
+  const [preview, setPreview] = useState(restaurant.image || "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -28,10 +28,10 @@ const ProfileEditModal = ({ isOpen, onClose, restaurant, onProfileUpdate }) => {
   useEffect(() => {
     setFormData({
       image: null,
-      isEcoFriendly: restaurant?.isEcoFriendly || false,
-      location: restaurant?.location || "",
+      isEcoFriendly: restaurant.isEcoFriendly || false,
+      location: restaurant.location || "",
     });
-    setPreview(restaurant?.image || "");
+    setPreview(restaurant.image || "");
     setError(null);
   }, [restaurant]);
 
