@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Download, X } from "lucide-react";
 
 export default function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -16,16 +16,19 @@ export default function PWAInstallPrompt() {
       setShowPrompt(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     // Check if app is already installed
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
+    const isInstalled = window.matchMedia("(display-mode: standalone)").matches;
     if (isInstalled) {
       setShowPrompt(false);
     }
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      );
     };
   }, []);
 
@@ -39,11 +42,11 @@ export default function PWAInstallPrompt() {
 
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+
+    if (outcome === "accepted") {
+      console.log("User accepted the install prompt");
     } else {
-      console.log('User dismissed the install prompt');
+      console.log("User dismissed the install prompt");
     }
 
     // Clear the deferredPrompt for the next time
@@ -54,7 +57,7 @@ export default function PWAInstallPrompt() {
   const dismissPrompt = () => {
     setShowPrompt(false);
     // Optionally save to localStorage to prevent showing again in this session
-    localStorage.setItem('pwaPromptDismissed', 'true');
+    localStorage.setItem("pwaPromptDismissed", "true");
   };
 
   if (!showPrompt) return null;
@@ -69,7 +72,9 @@ export default function PWAInstallPrompt() {
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">Install YumCycle</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Install YumCycle
+            </h3>
             <p className="text-sm text-gray-600 mt-1">
               Add YumCycle to your home screen for quick and easy access
             </p>

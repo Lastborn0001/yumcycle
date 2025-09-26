@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ff7300" />
+        <meta name="theme-color" content="#fff" />
         <link rel="apple-touch-icon" href="/images/yumcycle.png" />
       </head>
       <body
