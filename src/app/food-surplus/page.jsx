@@ -18,7 +18,7 @@ const page = () => {
           {/* Stats Section */}
           {/* <Stats /> */}
           {/* why food waste matter */}
-          <FoodWasteMatter />
+          {/* <FoodWasteMatter /> */}
           {/* help */}
           <Help />
         </main>

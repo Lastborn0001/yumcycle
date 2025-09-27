@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from "@/libs/AuthContext";
 import Loading from "@/components/ui/Loading";
 import dynamic from "next/dynamic";
 
-// Dynamically import PWAInstallPrompt with no SSR
 const PWAInstallPrompt = dynamic(
   () => import("@/components/ui/PWAInstallPrompt"),
   { ssr: false }
