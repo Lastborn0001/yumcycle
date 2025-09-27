@@ -4,6 +4,8 @@ import RestaurantProfile from "@/models/RestaurantProfile";
 import MenuItem from "@/models/MenuItem";
 import User from "@/models/User";
 import admin from "@/libs/firebaseAdmin";
+import UserNotification from "@/models/UserNotification";
+import { sendEmail } from "@/libs/utils/sendEmail";
 import { uploadImage } from "@/libs/utils/cloudinary";
 
 async function verifyRestaurantOwner(token) {
@@ -237,6 +239,10 @@ export async function PATCH(req) {
       return Response.json({ error: "Menu item not found" }, { status: 404 });
     }
 
+    // Track if the item was newly marked as surplus or surplus price changed
+    const wasSurplus = menuItem.isSurplus;
+    const previousSurplusPrice = menuItem.surplusPrice;
+
     // Update fields only if provided
     if (name) menuItem.name = name;
     if (description) menuItem.description = description;
@@ -304,6 +310,94 @@ export async function PATCH(req) {
     menuItem.image = imageUrl;
 
     await menuItem.save();
+
+    // Send notification if item is newly marked as surplus or surplus price changed
+    if (
+      isSurplus &&
+      (!wasSurplus || previousSurplusPrice !== parseFloat(surplusPrice))
+    ) {
+      try {
+        // Find users with surplus notifications enabled
+        const usersToNotify = await UserNotification.find({
+          "preferences.surplus": true,
+          "preferences.email": true,
+        });
+
+        for (const userNotification of usersToNotify) {
+          const notification = {
+            type: "surplus",
+            title: `New Surplus Item: ${menuItem.name}`,
+            message: `A new surplus item "${menuItem.name}" is available at ${
+              restaurant.name
+            } for ₦${menuItem.surplusPrice.toFixed(
+              2
+            )} (original price: ₦${menuItem.originalPrice.toFixed(2)}).`,
+            isRead: false,
+            createdAt: new Date(),
+          };
+
+          // Check for duplicates within the last minute
+          const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+          const existingNotification = userNotification.notifications.find(
+            (n) =>
+              n.type === notification.type &&
+              n.title === notification.title &&
+              n.message === notification.message &&
+              n.createdAt > oneMinuteAgo
+          );
+
+          if (!existingNotification) {
+            // Add notification to user's history
+            await UserNotification.findByIdAndUpdate(userNotification._id, {
+              $push: { notifications: notification },
+            });
+
+            // Send email
+            try {
+              const userRecord = await admin
+                .auth()
+                .getUser(userNotification.userId);
+              if (userRecord.email) {
+                await sendEmail({
+                  to: userRecord.email,
+                  subject: notification.title,
+                  text: notification.message,
+                  html: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px;">
+                      <h2 style="color: #f97316;">${notification.title}</h2>
+                      <p style="font-size: 16px; color: #4b5563;">
+                        Hello ${userRecord.displayName || "there"},
+                      </p>
+                      <p style="font-size: 16px; color: #4b5563;">
+                        ${notification.message}
+                      </p>
+                      <p style="font-size: 14px; color: #6b7280;">
+                        You received this email because you have enabled surplus notifications on YumCycle.
+                      </p>
+                    </div>
+                  `,
+                });
+                console.log(
+                  `Email sent to ${userRecord.email} for surplus item ${menuItem.name}`
+                );
+              }
+            } catch (emailError) {
+              console.error(
+                `Failed to send email to user ${userNotification.userId}:`,
+                emailError
+              );
+            }
+          }
+        }
+      } catch (notificationError) {
+        console.error(
+          "Error sending surplus notifications:",
+          notificationError
+        );
+        // Don't fail the request if notifications fail
+      }
+    }
+
     return Response.json(menuItem, { status: 200 });
   } catch (error) {
     console.error("Error updating menu item:", error.message, error.stack);
