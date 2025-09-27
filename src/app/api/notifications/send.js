@@ -179,11 +179,11 @@ export async function POST(req) {
 
                 <!-- CTA Section -->
                 <div style="padding: 0 30px 40px; text-align: center;">
-                  <a href="https://yourapp.com" style="display: inline-block; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s ease; letter-spacing: 0.25px;">
+                  <a href="https://yumcycle.vercel.app" style="display: inline-block; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 600; font-size: 16px; box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3); transition: all 0.3s ease; letter-spacing: 0.25px;">
                     Open YumCycle App
                   </a>
                   <p style="margin: 20px 0 0 0; font-size: 14px; color: #6b7280;">
-                    Or visit our website at <a href="https://yourapp.com" style="color: #f97316; text-decoration: none; font-weight: 600;">yourapp.com</a>
+                    Or visit our website at <a href="https://yumcycle.vercel.app" style="color: #f97316; text-decoration: none; font-weight: 600;">yumcycle.com</a>
                   </p>
                 </div>
               </div>
