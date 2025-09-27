@@ -48,8 +48,8 @@ const SurplusFilters = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-100 rounded-lg">
-            <Filter className="h-5 w-5 text-green-600" />
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <Filter className="h-5 w-5 text-orange-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
@@ -87,7 +87,7 @@ const SurplusFilters = ({
               onChange={(e) =>
                 onFiltersChange({ ...filters, restaurant: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
             >
               <option value="all">All Restaurants</option>
               {restaurants.map((restaurant) => (
@@ -110,7 +110,7 @@ const SurplusFilters = ({
               onChange={(e) =>
                 onFiltersChange({ ...filters, category: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
             >
               <option value="all">All Categories</option>
               {categories.map((category) => (
@@ -132,7 +132,7 @@ const SurplusFilters = ({
             onChange={(e) =>
               onFiltersChange({ ...filters, priceRange: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
           >
             {priceRanges.map((range) => (
               <option key={range.value} value={range.value}>
@@ -152,7 +152,7 @@ const SurplusFilters = ({
             onChange={(e) =>
               onFiltersChange({ ...filters, sortBy: e.target.value })
             }
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-sm"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white text-sm"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -175,23 +175,23 @@ const SurplusFilters = ({
               Active filters:
             </span>
             {filters.restaurant !== "all" && (
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+              <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                 Restaurant: {filters.restaurant}
               </span>
             )}
             {filters.category !== "all" && (
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+              <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                 Category: {filters.category}
               </span>
             )}
             {filters.priceRange !== "all" && (
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+              <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                 Price:{" "}
                 {priceRanges.find((r) => r.value === filters.priceRange)?.label}
               </span>
             )}
             {filters.sortBy !== "discount" && (
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+              <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                 Sort:{" "}
                 {sortOptions.find((s) => s.value === filters.sortBy)?.label}
               </span>
@@ -217,7 +217,7 @@ const SurplusFilters = ({
             onClick={() => onFiltersChange({ ...filters, priceRange: "0-500" })}
             className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer transition-colors ${
               filters.priceRange === "0-500"
-                ? "bg-green-500 text-white"
+                ? "bg-orange-500 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >

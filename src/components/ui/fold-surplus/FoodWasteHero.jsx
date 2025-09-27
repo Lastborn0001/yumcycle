@@ -37,7 +37,7 @@ const FoodWasteHero = () => {
             }}
             className="mb-8"
           >
-            <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
+            <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center mx-auto shadow-lg">
               <Leaf className="h-12 w-12 text-white" />
             </div>
           </motion.div>
@@ -50,7 +50,7 @@ const FoodWasteHero = () => {
             className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight"
           >
             Food Surplus{" "}
-            <span className="bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
               Marketplace
             </span>
           </motion.h1>
@@ -105,8 +105,8 @@ const FoodWasteHero = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Leaf className="h-8 w-8 text-green-600" />
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Leaf className="h-8 w-8 text-orange-600" />
               </div>
               <div className="text-3xl font-bold text-gray-900 mb-2">
                 2,500+

@@ -48,7 +48,7 @@ const SurplusItemCard = ({ item, onAddToCart }) => {
       <div className="p-6">
         {/* Item Header */}
         <div className="mb-4">
-          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors line-clamp-1">
+          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1">
             {item.name}
           </h3>
 
@@ -72,7 +72,7 @@ const SurplusItemCard = ({ item, onAddToCart }) => {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-green-600">
+              <span className="text-2xl font-bold text-orange-600">
                 ₦{surplusPrice.toFixed(2)}
               </span>
               <span className="text-sm text-gray-500 line-through">
@@ -80,20 +80,20 @@ const SurplusItemCard = ({ item, onAddToCart }) => {
               </span>
             </div>
             <div className="text-right">
-              <div className="text-sm font-semibold text-green-700">
+              <div className="text-sm font-semibold text-orange-700">
                 Save ₦{savings.toFixed(2)}
               </div>
             </div>
           </div>
 
           {/* Savings Highlight */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-3">
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-3">
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center space-x-1 text-green-700">
+              <div className="flex items-center space-x-1 text-orange-700">
                 <Star className="h-4 w-4 fill-current" />
                 <span className="font-medium">Great Deal!</span>
               </div>
-              <span className="text-green-800 font-semibold">
+              <span className="text-orange-800 font-semibold">
                 {discountPercentage}% discount
               </span>
             </div>
@@ -102,10 +102,9 @@ const SurplusItemCard = ({ item, onAddToCart }) => {
 
         {/* Action Button */}
         <motion.button
-          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onAddToCart}
-          className="w-full flex items-center cursor-pointer justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl group"
+          className="w-full flex items-center cursor-pointer justify-center space-x-2 px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl group"
         >
           <ShoppingCart className="h-5 w-5 group-hover:scale-110 transition-transform" />
           <span>Add to Cart</span>

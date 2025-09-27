@@ -81,18 +81,18 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/about"
+                  href="/orders"
                   className="text-gray-500 hover:text-orange-600"
                 >
-                  About Us
+                  Orders
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href="/cart"
                   className="text-gray-500 hover:text-orange-600"
                 >
-                  Contact
+                  Cart
                 </Link>
               </li>
             </ul>
@@ -101,7 +101,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="mt-4 space-y-2 text-sm">
-              <li>
+              {/* <li>
                 <Link
                   href="/faq"
                   className="text-gray-500 hover:text-orange-600"
@@ -124,7 +124,7 @@ const Footer = () => {
                 >
                   Partner With Us
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/careers"

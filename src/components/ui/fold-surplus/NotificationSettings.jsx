@@ -44,7 +44,7 @@ const NotificationSettings = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200 overflow-hidden"
+      className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl border border-orange-200 overflow-hidden"
     >
       {/* Header */}
       <div
@@ -56,7 +56,7 @@ const NotificationSettings = () => {
             <motion.div
               animate={{ rotate: isExpanded ? 360 : 0 }}
               transition={{ duration: 0.3 }}
-              className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg"
+              className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg"
             >
               <Bell className="h-6 w-6 text-white" />
             </motion.div>
@@ -64,7 +64,7 @@ const NotificationSettings = () => {
               <h3 className="text-xl font-bold text-gray-900">
                 Surplus Notifications
               </h3>
-              <p className="text-green-700 text-sm">
+              <p className="text-orange-700 text-sm">
                 Stay updated on new surplus food opportunities
               </p>
             </div>
@@ -72,7 +72,7 @@ const NotificationSettings = () => {
 
           <div className="flex items-center space-x-4">
             {enabledCount > 0 && (
-              <div className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
+              <div className="px-3 py-1 bg-orange-500 text-white rounded-full text-sm font-medium">
                 {enabledCount} active
               </div>
             )}
@@ -116,14 +116,14 @@ const NotificationSettings = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-green-100"
+                  className="bg-white rounded-xl p-4 shadow-sm border border-orange-100"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div
                         className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           isEnabled
-                            ? "bg-green-500 text-white"
+                            ? "bg-orange-500 text-white"
                             : "bg-gray-100 text-gray-400"
                         }`}
                       >
@@ -143,7 +143,7 @@ const NotificationSettings = () => {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleToggle(type.key)}
                       className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-                        isEnabled ? "bg-green-500" : "bg-gray-300"
+                        isEnabled ? "bg-orange-500" : "bg-gray-300"
                       }`}
                     >
                       <motion.div
@@ -155,7 +155,7 @@ const NotificationSettings = () => {
                         className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center"
                       >
                         {isEnabled && (
-                          <Check className="h-3 w-3 text-green-500" />
+                          <Check className="h-3 w-3 text-orange-500" />
                         )}
                       </motion.div>
                     </motion.button>
@@ -166,7 +166,7 @@ const NotificationSettings = () => {
           </div>
 
           {/* Quick Enable All */}
-          <div className="mt-6 pt-4 border-t border-green-200">
+          <div className="mt-6 pt-4 border-t border-orange-200">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-gray-700">
                 Enable all notifications for maximum savings
@@ -181,10 +181,10 @@ const NotificationSettings = () => {
                     restaurants: newState,
                   });
                 }}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                className={`px-4 py-2 rounded-lg cursor-pointer font-medium text-sm transition-colors ${
                   enabledCount === notificationTypes.length
                     ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    : "bg-green-500 text-white hover:bg-green-600"
+                    : "bg-orange-500 text-white hover:bg-orange-600"
                 }`}
               >
                 {enabledCount === notificationTypes.length
