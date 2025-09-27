@@ -1,20 +1,143 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bell, BellRing, Settings, Check } from "lucide-react";
+import { getAuth } from "firebase/auth";
+import { app } from "@/libs/firebase-client";
+import { toast } from "react-hot-toast";
 
-const NotificationSettings = () => {
+const NotificationSettings = ({ userEmail }) => {
   const [notifications, setNotifications] = useState({
     surplus: false,
     discounts: false,
     restaurants: false,
   });
   const [isExpanded, setIsExpanded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const handleToggle = (type) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [type]: !prev[type],
-    }));
+  // Fetch user's notification preferences
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const auth = getAuth(app);
+        const user = auth.currentUser;
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        const token = await user.getIdToken();
+        const response = await fetch("/api/notifications/preferences/get", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch preferences");
+        }
+
+        const data = await response.json();
+        setNotifications({
+          surplus: data.notificationPreferences?.surplus || false,
+          discounts: data.notificationPreferences?.discounts || false,
+          restaurants: data.notificationPreferences?.restaurants || false,
+        });
+      } catch (error) {
+        console.error("Error fetching preferences:", error);
+        toast.error("Failed to load notification preferences");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPreferences();
+  }, []);
+
+  const sendNotification = async (type) => {
+    try {
+      const auth = getAuth(app);
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const token = await user.getIdToken();
+      const response = await fetch("/api/notifications/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type,
+          title: `${type.charAt(0).toUpperCase() + type.slice(1)} Notification`,
+          message: `You have enabled ${type} notifications on YumCycle.`,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Failed to send ${type} notification:`,
+          await response.text()
+        );
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  const handleToggle = async (type) => {
+    try {
+      const auth = getAuth(app);
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error("Please log in to update notifications");
+        return;
+      }
+
+      const newValue = !notifications[type];
+
+      // Optimistically update UI
+      setNotifications((prev) => ({
+        ...prev,
+        [type]: newValue,
+      }));
+
+      const token = await user.getIdToken();
+      const response = await fetch("/api/notifications/preferences", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type,
+          enabled: newValue,
+        }),
+      });
+
+      if (!response.ok) {
+        // Revert on error
+        setNotifications((prev) => ({
+          ...prev,
+          [type]: !newValue,
+        }));
+        throw new Error("Failed to update notification settings");
+      }
+
+      // Send notification only if enabling the type
+      if (newValue) {
+        await sendNotification(type);
+      }
+
+      toast.success(
+        `${type.charAt(0).toUpperCase() + type.slice(1)} notifications ${
+          newValue ? "enabled" : "disabled"
+        }`
+      );
+    } catch (error) {
+      console.error("Error updating notification:", error);
+      toast.error(error.message || "Failed to update notification settings");
+    }
   };
 
   const notificationTypes = [
@@ -39,6 +162,15 @@ const NotificationSettings = () => {
   ];
 
   const enabledCount = Object.values(notifications).filter(Boolean).length;
+
+  if (loading) {
+    return (
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl border border-orange-200 p-6 animate-pulse">
+        <div className="h-12 bg-orange-100 rounded-xl w-32 mb-4"></div>
+        <div className="h-4 bg-orange-100 rounded w-3/4"></div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -172,7 +304,7 @@ const NotificationSettings = () => {
                 Enable all notifications for maximum savings
               </span>
               <button
-                onClick={() => {
+                onClick={async () => {
                   const allEnabled = enabledCount === notificationTypes.length;
                   const newState = !allEnabled;
                   setNotifications({
@@ -180,6 +312,51 @@ const NotificationSettings = () => {
                     discounts: newState,
                     restaurants: newState,
                   });
+
+                  try {
+                    const auth = getAuth(app);
+                    const user = auth.currentUser;
+                    if (!user) {
+                      toast.error("Please log in to update notifications");
+                      return;
+                    }
+
+                    const token = await user.getIdToken();
+                    for (const type of notificationTypes.map((t) => t.key)) {
+                      const response = await fetch(
+                        "/api/notifications/preferences",
+                        {
+                          method: "PUT",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                          },
+                          body: JSON.stringify({
+                            type,
+                            enabled: newState,
+                          }),
+                        }
+                      );
+
+                      if (!response.ok) {
+                        throw new Error(
+                          `Failed to update ${type} notification`
+                        );
+                      }
+
+                      if (newState) {
+                        await sendNotification(type);
+                      }
+                    }
+
+                    toast.success(
+                      `All notifications ${newState ? "enabled" : "disabled"}`
+                    );
+                  } catch (error) {
+                    console.error("Error updating all notifications:", error);
+                    setNotifications(notifications); // Revert to previous state
+                    toast.error("Failed to update all notifications");
+                  }
                 }}
                 className={`px-4 py-2 rounded-lg cursor-pointer font-medium text-sm transition-colors ${
                   enabledCount === notificationTypes.length
