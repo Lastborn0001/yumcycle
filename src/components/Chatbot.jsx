@@ -68,6 +68,12 @@ export default function Chatbot() {
     },
     {
       id: 8,
+      question: "Can I pay cash on delivery for my order?",
+      icon: "",
+      category: "payment",
+    },
+    {
+      id: 10,
       question: "Other questions",
       icon: "",
       category: "custom",
