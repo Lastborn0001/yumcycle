@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @media (min-width: 1000px) {
   .navv {
     width: 80%;

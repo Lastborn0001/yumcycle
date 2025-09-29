@@ -73,19 +73,19 @@ const FoodWasteHero = () => {
             transition={{ delay: 0.6, duration: 0.6 }}
             className="flex flex-wrap justify-center gap-6 mb-12"
           >
-            <div className="flex items-center space-x-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-green-200 shadow-sm">
+            <div className="flex items-center space-x-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-orange-200 shadow-sm">
               <TrendingDown className="h-5 w-5 text-green-600" />
               <span className="font-semibold text-gray-700">Up to 70% Off</span>
             </div>
 
-            <div className="flex items-center space-x-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-green-200 shadow-sm">
+            <div className="flex items-center space-x-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-orange-200 shadow-sm">
               <Heart className="h-5 w-5 text-red-500" />
               <span className="font-semibold text-gray-700">
                 Help Environment
               </span>
             </div>
 
-            <div className="flex items-center space-x-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-green-200 shadow-sm">
+            <div className="flex items-center space-x-3 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full border border-orange-200 shadow-sm">
               <Clock className="h-5 w-5 text-blue-600" />
               <span className="font-semibold text-gray-700">Limited Time</span>
             </div>

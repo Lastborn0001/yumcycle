@@ -242,7 +242,7 @@ export default function Chatbot() {
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-white space-y-4">
+            <div className="flex-1 overflow-y-auto no-scrollbar p-4 bg-gradient-to-b from-gray-50 to-white space-y-4">
               {messages.map((msg, i) => (
                 <motion.div
                   key={i}
@@ -283,20 +283,20 @@ export default function Chatbot() {
             </div>
 
             {/* FAQ Questions or Custom Input */}
-            <div className="p-4 border-t bg-white">
+            <div className="p-4 border-t border-gray-300 bg-white">
               {!showCustomInput ? (
-                <div className="space-y-3">
+                <div className="space-y-3 no-scrollbar">
                   <p className="text-sm font-semibold text-gray-700 mb-3">
                     How can we help you?
                   </p>
-                  <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-2 max-h-[200px] no-scrollbar overflow-y-auto">
                     {faqQuestions.map((faq) => (
                       <motion.button
                         key={faq.id}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleFAQClick(faq)}
-                        className={`p-3 rounded-xl text-left transition-all duration-200 ${
+                        className={`p-3 rounded-xl text-left cursor-pointer transition-all duration-200 ${
                           faq.isCustom
                             ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md hover:shadow-lg col-span-2"
                             : "bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-orange-300"
