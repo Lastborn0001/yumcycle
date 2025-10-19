@@ -1,4 +1,3 @@
-// components/CartInitializer.js
 "use client";
 import { useEffect } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";

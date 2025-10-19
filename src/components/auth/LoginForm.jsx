@@ -24,6 +24,7 @@ import {
 export default function AuthForms() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const [forgetPassword, setforgetPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -90,7 +91,6 @@ export default function AuthForms() {
           };
         }
 
-        // Send registration data to backend
         const response = await fetch("/api/auth/register", {
           method: "POST",
           headers: {
@@ -386,7 +386,11 @@ export default function AuthForms() {
             </div>
           </div>
 
-          <div className="mt-6 text-center text-sm">
+          <div
+            className={`mt-6 ${
+              isLogin ? "flex justify-between" : "text-center"
+            } text-sm`}
+          >
             <button
               onClick={() => setIsLogin(!isLogin)}
               className="font-medium cursor-pointer text-orange-600 hover:text-orange-500 focus:outline-none"
@@ -395,6 +399,16 @@ export default function AuthForms() {
                 ? "Need an account? Register"
                 : "Already have an account? Sign in"}
             </button>
+            {isLogin ? (
+              <a
+                className="font-medium cursor-pointer text-orange-600 hover:text-orange-500 focus:outline-none"
+                href="/"
+              >
+                Forgot Password
+              </a>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>
