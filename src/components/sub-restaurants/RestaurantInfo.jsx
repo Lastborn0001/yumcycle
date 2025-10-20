@@ -79,12 +79,12 @@ const RestaurantInfo = ({ restaurant }) => {
               <span>Contact Information</span>
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              {restaurant.phone && (
+              {restaurant.location && (
                 <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                   <Phone className="h-4 w-4 text-gray-600" />
                   <div>
                     <p className="text-gray-600">Phone</p>
-                    <p className="font-medium text-gray-900">{restaurant.phone}</p>
+                    <p className="font-medium text-gray-900">{restaurant.location}</p>
                   </div>
                 </div>
               )}
@@ -145,7 +145,7 @@ const RestaurantInfo = ({ restaurant }) => {
               <span>Payment Methods</span>
             </h4>
             <div className="flex flex-wrap gap-3">
-              {['Card Payment', 'Bank Transfer', 'Cash on Delivery'].map((method, index) => (
+              {['Card Payment', 'Bank Transfer'].map((method, index) => (
                 <span
                   key={index}
                   className="px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm font-medium border border-green-200"
