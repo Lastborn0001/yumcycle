@@ -5,7 +5,7 @@ const cartItemSchema = new mongoose.Schema(
     _id: { type: String, required: true },
     name: { type: String, required: true },
     price: { type: Number, required: true },
-    restaurantId: { type: String, required: true },
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
     restaurantName: { type: String, required: true },
     image: String,
     category: String,

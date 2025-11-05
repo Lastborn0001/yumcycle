@@ -66,16 +66,18 @@ const CheckoutPage = () => {
     // console.log("CheckoutPage: Cart items:", items);
   }, [items]);
 
+  const isDonating = useCartStore((state) => state.isDonating);
+  
   const subtotal = items.reduce(
     (total, item) => total + (item.price * item.quantity || 0),
     0
   );
   const deliveryFee = 30;
   const serviceFee = 40;
-  const tax = 300;
-  const tip = 400;
-  const donation = 2;
-  const total = subtotal + deliveryFee + serviceFee + tax + tip + donation;
+  const tax = 0.075 * subtotal;
+  const mealDonationAmount = 100;
+  const donation = isDonating ? mealDonationAmount : 0;
+  const total = subtotal + deliveryFee + serviceFee + tax + donation;
 
   const verifyPayment = async (reference) => {
     try {
@@ -174,7 +176,7 @@ const CheckoutPage = () => {
   return (
     <ClientLayout>
       <Nav />
-      <main className="lg:w-[80%] h-dvh p-5 w-full m-auto">
+      <main className="lg:w-[80%] min-h-screen p-5 pt-12 w-full m-auto">
         <Toaster position="top-center" />
         <section>
           <div className="py-12 md:py-24">
@@ -281,16 +283,18 @@ const CheckoutPage = () => {
                         <span className="text-muted-foreground">Tax</span>
                         <span>₦{tax.toLocaleString()}</span>
                       </div>
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="text-muted-foreground">Tip</span>
                         <span>₦{tip.toLocaleString()}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">
-                          Meal Donation
-                        </span>
-                        <span>₦{donation.toLocaleString()}</span>
-                      </div>
+                      </div> */}
+                      {isDonating && (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            Meal Donation (Thank you!)
+                          </span>
+                          <span>₦{donation.toLocaleString()}</span>
+                        </div>
+                      )}
                       <hr className="border-gray-300" />
                       <div className="flex justify-between text-lg font-semibold">
                         <span>Total</span>

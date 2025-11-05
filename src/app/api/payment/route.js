@@ -1,4 +1,3 @@
-// app/api/payment/route.js
 import { connectToDatabase } from "@/libs/db/mongo";
 import Cart from "@/models/Cart";
 import Order from "@/models/Order";
@@ -103,11 +102,21 @@ export async function POST(req) {
       }
 
       const restaurantId = restaurantIds[0];
+
       if (!restaurantId) {
         return NextResponse.json(
           { error: "Restaurant ID missing in cart items" },
           { status: 400 }
         );
+      }
+
+      // Validate the format
+      let validRestaurantId;
+      if (mongoose.Types.ObjectId.isValid(restaurantId)) {
+        validRestaurantId = new mongoose.Types.ObjectId(restaurantId);
+      } else {
+        // fallback to string if not a valid ObjectId
+        validRestaurantId = restaurantId;
       }
 
       // Calculate order totals
@@ -127,7 +136,7 @@ export async function POST(req) {
       // Create order
       const order = await Order.create({
         userUid: decoded.uid,
-        restaurantId: new mongoose.Types.ObjectId(restaurantId),
+        restaurantId: validRestaurantId,
         items: cart.items.map((item) => ({
           _id: item._id,
           name: item.name,

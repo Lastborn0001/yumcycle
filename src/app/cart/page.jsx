@@ -50,6 +50,9 @@ const CartPage = () => {
     }
   }, [user, loading, cartStatus, router]);
 
+  const isDonating = useCartStore((state) => state.isDonating);
+  const setIsDonating = (value) => useCartStore.setState({ isDonating: value });
+
   const subtotal = useMemo(
     () =>
       cartItems && Array.isArray(cartItems)
@@ -62,10 +65,11 @@ const CartPage = () => {
   );
   const deliveryFee = 30;
   const serviceFee = 40;
-  const tax = 300;
-  const tip = 400;
-  const donation = 2;
-  const total = subtotal + deliveryFee + serviceFee + tax + tip + donation;
+  const tax = 0.075 * subtotal;
+  // const tip = 400;
+  const mealDonationAmount = 100;
+  const donation = isDonating ? mealDonationAmount : 0;
+  const total = subtotal + deliveryFee + serviceFee + tax + donation;
 
   const handleIncrement = async (itemId) => {
     try {
@@ -251,10 +255,16 @@ const CartPage = () => {
                           meals to those facing food insecurity.
                         </p>
                         <div className="mt-3 flex items-center space-x-2">
-                          <input type="checkbox" id="donate-meal" />
+                          <input
+                            type="checkbox"
+                            id="donate-meal"
+                            checked={isDonating}
+                            onChange={(e) => setIsDonating(e.target.checked)}
+                            className="cursor-pointer"
+                          />
                           <label
                             htmlFor="donate-meal"
-                            className="text-sm font-medium leading-none"
+                            className="text-sm font-medium leading-none cursor-pointer"
                           >
                             Yes, I'd like to donate a meal (+₦100)
                           </label>
@@ -289,13 +299,13 @@ const CartPage = () => {
                         <span className="text-muted-foreground">Tax</span>
                         <span>₦{tax}</span>
                       </div>
-                      <div className="flex justify-between">
+                      {/* <div className="flex justify-between">
                         <span className="text-muted-foreground">Tip</span>
                         <span>₦{tip}</span>
-                      </div>
+                      </div> */}
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">
-                          Meal Donation
+                          Meal Donation {isDonating && "(Thank you!)"}
                         </span>
                         <span>₦{donation}</span>
                       </div>

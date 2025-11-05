@@ -41,11 +41,17 @@ export async function POST(req) {
     if (existingIndex >= 0) {
       cart.items[existingIndex].quantity += 1;
     } else {
+      // Convert restaurantId to ObjectId if it's a string
+      const restaurantId = (item.restaurantId || item.restaurant)?.toString();
+      if (!mongoose.Types.ObjectId.isValid(restaurantId)) {
+        throw new Error("Invalid restaurant ID format");
+      }
+
       cart.items.push({
         _id: item._id,
         name: item.name,
         price: item.price,
-        restaurantId: item.restaurantId || item.restaurant,
+        restaurantId: new mongoose.Types.ObjectId(restaurantId),
         restaurantName: item.restaurantName,
         image: item.image || "",
         category: item.category || "general",
@@ -91,6 +97,13 @@ export async function PATCH(req) {
     const decoded = await getAuthenticatedUser(req);
     const { itemId, action } = await req.json();
 
+    // Validate data
+    if (!itemId || !action) {
+      return NextResponse.json(
+        { error: "ItemId and action are required" },
+        { status: 400 }
+      );
+    }
     const cart = await Cart.findOne({ userUid: decoded.uid });
     if (!cart) {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 });

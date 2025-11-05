@@ -5,6 +5,7 @@ export const useCartStore = create((set, get) => ({
   items: [],
   status: "idle",
   error: null,
+  isDonating: false,
 
   addToCart: async (item, userToken) => {
     try {
