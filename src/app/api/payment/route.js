@@ -69,7 +69,11 @@ export async function POST(req) {
 
     await connectToDatabase();
     const decoded = await getAuthenticatedUser(req);
-    const { reference, email, amount, phoneNumber, address } = await req.json();
+
+    // Read request body once at the start
+    const requestBody = await req.json();
+    const { reference, email, amount, phoneNumber, address, amounts } =
+      requestBody;
 
     if (reference) {
       // Verify payment with retry mechanism
@@ -77,9 +81,9 @@ export async function POST(req) {
       //   console.log("Paystack verification successful:", result);
 
       // Validate required fields
-      if (!phoneNumber || !address) {
+      if (!phoneNumber || !address || !amounts) {
         return NextResponse.json(
-          { error: "Phone number and address are required" },
+          { error: "Required fields missing" },
           { status: 400 }
         );
       }
@@ -119,21 +123,22 @@ export async function POST(req) {
         validRestaurantId = restaurantId;
       }
 
-      // Calculate order totals
-      const subtotal = cart.items.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      );
-      const fees = {
-        deliveryFee: 30,
-        serviceFee: 40,
-        tax: 300,
-        tip: 400,
-        donation: 2,
-      };
-      const total = subtotal + Object.values(fees).reduce((a, b) => a + b, 0);
+      // Validate the amounts from the frontend request
+      const { subtotal, deliveryFee, serviceFee, tax, donation, total } =
+        amounts;
 
-      // Create order
+      // Validate amounts
+      const calculatedTotal =
+        subtotal + deliveryFee + serviceFee + tax + donation;
+      if (Math.abs(calculatedTotal - total) > 0.01) {
+        // Allow for small floating point differences
+        return NextResponse.json(
+          { error: "Total amount mismatch" },
+          { status: 400 }
+        );
+      }
+
+      // Create order with frontend amounts
       const order = await Order.create({
         userUid: decoded.uid,
         restaurantId: validRestaurantId,
@@ -149,7 +154,11 @@ export async function POST(req) {
           description: item.description,
         })),
         subtotal,
-        ...fees,
+        deliveryFee,
+        serviceFee,
+        tax,
+        tip: 0, // Set default tip to 0
+        donation,
         total,
         phoneNumber,
         address,

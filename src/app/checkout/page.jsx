@@ -67,7 +67,7 @@ const CheckoutPage = () => {
   }, [items]);
 
   const isDonating = useCartStore((state) => state.isDonating);
-  
+
   const subtotal = items.reduce(
     (total, item) => total + (item.price * item.quantity || 0),
     0
@@ -84,13 +84,28 @@ const CheckoutPage = () => {
       const token = await firebaseUser.getIdToken();
       if (!token) throw new Error("User not authenticated");
 
+      // Round all amounts to 2 decimal places to ensure consistent calculations
+      const orderDetails = {
+        reference,
+        phoneNumber,
+        address,
+        amounts: {
+          subtotal: Math.round(subtotal * 100) / 100,
+          deliveryFee: Math.round(deliveryFee * 100) / 100,
+          serviceFee: Math.round(serviceFee * 100) / 100,
+          tax: Math.round(tax * 100) / 100,
+          donation: isDonating ? mealDonationAmount : 0,
+          total: Math.round(total * 100) / 100,
+        },
+      };
+
       const verifyResponse = await fetch("/api/payment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ reference, phoneNumber, address }),
+        body: JSON.stringify(orderDetails),
       });
 
       if (!verifyResponse.ok) {

@@ -21,7 +21,7 @@ const OrderSchema = new mongoose.Schema({
   deliveryFee: { type: Number, required: true },
   serviceFee: { type: Number, required: true },
   tax: { type: Number, required: true },
-  tip: { type: Number, required: true },
+  tip: { type: Number, default: 0 },
   donation: { type: Number, required: true },
   total: { type: Number, required: true },
   phoneNumber: { type: String, required: true },
